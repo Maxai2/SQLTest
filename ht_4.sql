@@ -128,7 +128,7 @@
 
 --SELECT Publisher
 --FROM Books
---WHERE Publisher LIKE N'%ë%à%ê%' OR Publisher LIKE N'%ê%à%ë%' OR Publisher LIKE N'%ê%ë%à%' OR Publisher LIKE  N'%à%ë%ê%'
+--WHERE Publisher LIKE N'%л%а%к%' OR Publisher LIKE N'%к%л%а%' OR Publisher LIKE N'%к%а%л%' OR Publisher LIKE  N'%а%л%к%'
 
 /* 19. Вывести книги, названия которых не содержат английских букв, с числом страниц, кратным 2. */
 
