@@ -91,26 +91,34 @@
 
 /*9. Вывести самого популярного автора(ов) среди студентов и количе-ство книг этого автора, взятых в библиотеке. */
 
---SELECT Authors.FirstName, Authors.LastName, (SELECT )
---FROM Authors 
-
-/*10. Вывести самого популярного автора(ов) среди преподавате-лей и количество книг этого автора, взятых в библиотеке. ? */
-
---SELECT Authors.FirstName, Authors.LastName, COUNT(Books.Id_Author) AS BooksCount
---FROM Authors JOIN Books
---	ON Authors.Id = Books.Id_Author
+--SELECT TOP (1) with ties Authors.FirstName, Authors.LastName, COUNT(S_Cards.Id) AS TakeCount
+--FROM 
+--(
+--	Authors JOIN Books 
+--		ON Authors.Id = Books.Id_Author
+--) JOIN S_Cards 
+--	ON Books.Id = S_Cards.Id_Book
 --GROUP BY Authors.FirstName, Authors.LastName
---HAVING MAX(SELECT MAX(T_Cards.Id_Book) FROM T_Cards JOIN Books ON T_Cards.Id_Book = Books.Id)
+--ORDER BY COUNT(S_Cards.Id) DESC;
+
+/*10. Вывести самого популярного автора(ов) среди преподавате-лей и количество книг этого автора, взятых в библиотеке. */
+
+--SELECT TOP (1) with ties Authors.FirstName, Authors.LastName, COUNT(T_Cards.Id) AS TakeCount
+--FROM 
+--(
+--	Authors JOIN Books 
+--		ON Authors.Id = Books.Id_Author
+--) JOIN T_Cards 
+--	ON Books.Id = T_Cards.Id_Book
+--GROUP BY Authors.FirstName, Authors.LastName
+--ORDER BY COUNT(T_Cards.Id) DESC;
 
 /*11. Вывести самую популярную(ые) тематику(и) среди студентов и преподавателей. */
 
 --SELECT Themes.[Name]
---FROM Themes JOIN Books
---	ON Books.Id_Themes = Themes.Id
---WHERE Themes.Id = SOME (SELECT MAX(Books.Id_Themes) FROM S_Cards JOIN Books ON S_Cards.Id_Book = Books.Id) 
---  AND Themes.Id = SOME (SELECT MAX(Books.Id_Themes) FROM T_Cards JOIN Books ON T_Cards.Id_Book = Books.Id)
+--FROM Themes
 
-/*12. Отобразить количество преподавателей и студентов, посетивших библиотеку. */
+/*12. Отобразить количество преподавателей и студентов, посетивших библиотеку. ? */
 
 --SELECT COUNT(T_Cards.Id_Lib) AS TeachersCount, COUNT(S_Cards.Id_Lib) AS StudentsCount
 --FROM T_Cards JOIN Libs
@@ -118,8 +126,11 @@
 --	JOIN S_Cards
 --	ON S_Cards.Id_Lib = Libs.Id
 
-/*13. Если считать общее количество книг в библиотеке за 100%, то необходимо подсчитать, сколько книг (в процентном отношении) брал каждый факультет.
-14. Отобразить самый читающий факультет и самую читающую
+/*13. Если считать общее количество книг в библиотеке за 100%, то необходимо подсчитать, сколько книг (в процентном отношении) брал каждый факультет. */
+
+
+
+/*14. Отобразить самый читающий факультет и самую читающую
 кафедру.
 15. Показать автора (ов) самых популярных книг среди препода-
 вателей и студентов.
