@@ -63,14 +63,14 @@
 --GROUP BY Authors.FirstName, Authors.LastName, Books.Pages
 --HAVING AVG(Books.Pages) > 600
 
-/*7. Отобразить информацию об издательствах, у которых общее коли-чество страниц выпущенных ими книг больше 700. */
+/*7. Отобразить информацию об издательствах, у которых общее коли-чество страниц выпущенных ими книг больше 700. ? */
 
---SELECT Press.[Name], Books.Pages
+--SELECT Press.[Name], SUM(Books.Pages) AS SumPages
 --FROM Press JOIN Books
 --	ON Press.Id = Books.Id_Press
---GROUP BY Press.[Name], Books.Pages
---HAVING AVG(Books.Pages) > 700
-
+--GROUP BY Press.[Name]
+--HAVING SUM(Books.Pages) > 700
+		
 /*8. Отобразить всех посетителей библиотеки (и студентов и препода-вателей) и книги, которые они брали. */
 
 --SELECT Students.FirstName, Students.LastName, [Groups].[Name], Books.[Name]
@@ -113,32 +113,78 @@
 --GROUP BY Authors.FirstName, Authors.LastName
 --ORDER BY COUNT(T_Cards.Id) DESC;
 
-/*11. Вывести самую популярную(ые) тематику(и) среди студентов и преподавателей. */
+/*11. Вывести самую популярную(ые) тематику(и) среди студентов и преподавателей. ? */
 
---SELECT Themes.[Name]
---FROM Themes
+--SELECT TOP (1) with ties N'Студенты' AS TrainingCol, Themes.[Name]
+--FROM 
+--(
+--	Themes JOIN Books 
+--		ON Themes.Id = Books.Id_Themes
+--) JOIN S_Cards 
+--	ON Books.Id = S_Cards.Id_Book
+--GROUP BY Themes.[Name]
+--ORDER BY COUNT(S_Cards.Id) DESC
 
-/*12. Отобразить количество преподавателей и студентов, посетивших библиотеку. ? */
+--SELECT TOP (1) with ties N'Учителя' AS TrainingCol, Themes.[Name]
+--FROM 
+--(
+--	Themes JOIN Books 
+--		ON Themes.Id = Books.Id_Themes
+--) JOIN T_Cards 
+--	ON Books.Id = T_Cards.Id_Book
+--GROUP BY Themes.[Name]
+--ORDER BY COUNT(T_Cards.Id) DESC
 
---SELECT COUNT(T_Cards.Id_Lib) AS TeachersCount, COUNT(S_Cards.Id_Lib) AS StudentsCount
---FROM T_Cards JOIN Libs
---	ON T_Cards.Id_Lib = Libs.Id
---	JOIN S_Cards
---	ON S_Cards.Id_Lib = Libs.Id
+/*12. Отобразить количество преподавателей и студентов, посетивших библиотеку. */
+
+--SELECT N'Количество студентов' AS Visitors, COUNT(S_Cards.Id) AS [Count]
+--FROM S_Cards
+--UNION
+--SELECT N'Количество учителей', COUNT(T_Cards.Id) AS [Count]
+--FROM T_Cards
 
 /*13. Если считать общее количество книг в библиотеке за 100%, то необходимо подсчитать, сколько книг (в процентном отношении) брал каждый факультет. */
 
+--SELECT Faculties.[Name] AS FacultiesName, (COUNT(Books.Id) * 100 / (SELECT COUNT(*) FROM Books)) AS [Percent]
+--FROM Faculties JOIN Groups
+--	ON Faculties.Id = Groups.Id_Faculty
+--	JOIN Students
+--	ON Students.Id_Group = Groups.Id
+--	JOIN S_Cards
+--	ON S_Cards.Id_Student = Students.Id
+--	JOIN Books
+--	ON Books.Id = S_Cards.Id_Book
+--GROUP BY Faculties.[Name]
 
+/*14. Отобразить самый читающий факультет и самую читающую кафедру. */
 
-/*14. Отобразить самый читающий факультет и самую читающую
-кафедру.
-15. Показать автора (ов) самых популярных книг среди препода-
-вателей и студентов.
+--SELECT * FROM (SELECT TOP(1) Faculties.[Name], COUNT(Groups.Id_Faculty) AS GroupsCount, N'У студентов' AS Team
+--FROM Faculties JOIN Groups
+--	ON Faculties.Id = Groups.Id_Faculty
+--	JOIN Students
+--	ON Students.Id_Group = Groups.Id
+--	JOIN S_Cards
+--	ON S_Cards.Id_Student = Students.Id
+--GROUP BY Faculties.[Name], Groups.Id_Faculty
+--ORDER BY GroupsCount DESC) AS res1
+--UNION
+--SELECT * FROM(
+--SELECT TOP(1) Departments.[Name], COUNT(Teachers.Id_Dep) AS DepartmentCount, N'У учителей' AS Team
+--FROM Departments JOIN Teachers
+--	ON Departments.Id = Teachers.Id_Dep
+--	JOIN T_Cards
+--	ON T_Cards.Id_Teacher = Teachers.Id
+--GROUP BY Departments.[Name], Teachers.Id_Dep
+--ORDER BY DepartmentCount DESC
+--) AS res2
 
-16. Отобразить названия самых популярных книг среди препода-
-вателей и студентов.
+/*15. Показать автора (ов) самых популярных книг среди преподавателей и студентов. */
+
+SELECT Authors.FirstName, Authors.LastName, COUNT()
+FROM Authors
+
+/*16. Отобразить названия самых популярных книг среди преподавателей и студентов.
 17. Показать всех студентов и преподавателей дизайнеров.
-18. Показать всю информацию о студентах и преподавателях,
-бравших книги.
+18. Показать всю информацию о студентах и преподавателях, бравших книги.
 19. Показать книги, которые брали и преподаватели и студенты.
 20. Показать сколько книг выдал каждый из библиотекарей.*/
