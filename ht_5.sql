@@ -180,11 +180,58 @@
 
 /*15. Показать автора (ов) самых популярных книг среди преподавателей и студентов. */
 
-SELECT Authors.FirstName, Authors.LastName, COUNT()
-FROM Authors
+--SELECT *
+--FROM (SELECT TOP(1) WITH TIES Authors.FirstName, Authors.LastName, COUNT(Books.Id) AS AutorsCount, N'Cтудентов' AS Team
+--FROM Authors JOIN Books
+--	ON Authors.Id = Books.Id_Author
+--	JOIN S_Cards
+--	ON Books.Id = S_Cards.Id_Book
+--GROUP BY Authors.FirstName, Authors.LastName
+--ORDER BY AutorsCount DESC) AS Student
+--UNION
+--SELECT * 
+--FROM (SELECT TOP(1) WITH TIES Authors.FirstName, Authors.LastName, COUNT(Books.Id) AS AutorsCount, N'Учителей' AS Team
+--FROM Authors JOIN Books
+--	ON Authors.Id = Books.Id_Author
+--	JOIN T_Cards
+--	ON Books.Id = T_Cards.Id_Book
+--GROUP BY Authors.FirstName, Authors.LastName
+--ORDER BY AutorsCount DESC) AS Teacher
+--ORDER BY Team
 
-/*16. Отобразить названия самых популярных книг среди преподавателей и студентов.
-17. Показать всех студентов и преподавателей дизайнеров.
-18. Показать всю информацию о студентах и преподавателях, бравших книги.
+/*16. Отобразить названия самых популярных книг среди преподавателей и студентов. */
+
+--SELECT * 
+--FROM (SELECT TOP(1) WITH TIES Books.[Name], COUNT(S_Cards.Id_Book) AS BookCount, N'Студентов' AS Team
+--FROM Books JOIN S_Cards
+--	ON Books.Id = S_Cards.Id_Book
+--GROUP BY Books.[Name]
+--ORDER BY BookCount DESC) AS Stud
+--UNION
+--SELECT *
+--FROM (SELECT TOP(1) WITH TIES Books.[Name], COUNT(T_Cards.Id_Book) AS BookCount, N'Учителей' AS Team
+--FROM Books JOIN T_Cards
+--	ON Books.Id = T_Cards.Id_Book
+--GROUP BY Books.[Name]
+--ORDER BY BookCount DESC) AS Teach
+--ORDER BY Team
+
+/*17. Показать всех студентов и преподавателей дизайнеров. */
+
+--SELECT *
+--FROM (SELECT Students.FirstName, Students.LastName, Groups.[Name] AS GroupName, Students.Term, Faculties.[Name] AS FacultiesName
+--FROM Students JOIN Groups
+--	ON Students.Id_Group = Groups.Id
+--	JOIN Faculties
+--	ON Groups.Id_Faculty = Faculties.Id
+--	WHERE Faculties.[Name] = N'Веб-дизайна') AS Stud
+--UNION
+--SELECT *
+--FROM (SELECT Teachers.FirstName, Teachers.LastName, Departments.[Name] AS DepartmentName, NULL, NULL
+--FROM Teachers JOIN Departments
+--	ON Teachers.Id_Dep = Departments.Id
+--	WHERE Departments.[Name] = N'Графики и Дизайна') AS Teach
+
+/*18. Показать всю информацию о студентах и преподавателях, бравших книги.
 19. Показать книги, которые брали и преподаватели и студенты.
 20. Показать сколько книг выдал каждый из библиотекарей.*/
