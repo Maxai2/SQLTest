@@ -225,13 +225,55 @@
 --	JOIN Faculties
 --	ON Groups.Id_Faculty = Faculties.Id
 --	WHERE Faculties.[Name] = N'Веб-дизайна') AS Stud
---UNION
+
 --SELECT *
---FROM (SELECT Teachers.FirstName, Teachers.LastName, Departments.[Name] AS DepartmentName, NULL, NULL
+--FROM (SELECT Teachers.FirstName, Teachers.LastName, Departments.[Name] AS DepartmentName
 --FROM Teachers JOIN Departments
 --	ON Teachers.Id_Dep = Departments.Id
 --	WHERE Departments.[Name] = N'Графики и Дизайна') AS Teach
 
-/*18. Показать всю информацию о студентах и преподавателях, бравших книги.
-19. Показать книги, которые брали и преподаватели и студенты.
-20. Показать сколько книг выдал каждый из библиотекарей.*/
+/*18. Показать всю информацию о студентах и преподавателях, бравших книги. */
+
+--SELECT Students.FirstName, Students.LastName, Groups.[Name] AS GroupName, Students.Term
+--FROM Students JOIN Groups
+--	ON Students.Id_Group = Groups.Id
+--	JOIN S_Cards
+--	ON S_Cards.Id_Student = Students.Id
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--SELECT Teachers.FirstName, Teachers.LastName, Departments.[Name] AS DepartmentName
+--FROM Teachers JOIN Departments
+--	ON Teachers.Id_Dep = Departments.Id
+--	JOIN T_Cards
+--	ON T_Cards.Id_Teacher = Teachers.Id
+
+/*19. Показать книги, которые брали и преподаватели и студенты. */
+
+--SELECT *
+--FROM (SELECT (Authors.[FirstName] + ' ' + Authors.LastName) AS AutothorsName, Books.[Name], N'Студенты' AS Team
+--FROM Books JOIN Authors
+--	ON Books.Id_Author = Authors.Id
+--	JOIN S_Cards
+--	ON Books.Id = S_Cards.Id_Student) AS Stud
+--UNION
+--SELECT *
+--FROM (SELECT (Authors.[FirstName] + ' ' + Authors.LastName) AS AutothorsName, Books.[Name], N'Учителя' AS Team
+--FROM Books JOIN Authors
+--	ON Books.Id_Author = Authors.Id
+--	JOIN T_Cards
+--	ON Books.Id = T_Cards.Id_Teacher) AS Teach
+--ORDER BY Team
+
+/*20. Показать сколько книг выдал каждый из библиотекарей.*/
+
+--SELECT *
+--FROM (SELECT (Libs.FirstName + ' ' + Libs.LastName) AS LibsName, COUNT(S_Cards.Id) AS Quantity, N'для судента' AS Team
+--FROM Libs JOIN S_Cards
+--	ON Libs.Id = S_Cards.Id_Lib
+--GROUP BY Libs.FirstName, Libs.LastName) AS Stud
+--UNION
+--SELECT *
+--FROM (SELECT (Libs.FirstName + ' ' + Libs.LastName) AS LibsName, COUNT(T_Cards.Id) AS Quantity, N'для учителя' AS Team
+--FROM Libs JOIN T_Cards
+--	ON Libs.Id = T_Cards.Id_Lib
+--GROUP BY Libs.FirstName, Libs.LastName) AS Teach
+--ORDER BY Team
