@@ -1,43 +1,199 @@
-/*1. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ÒÔËÒÓÍ ÍÌË„ Ò ÏËÌËÏ‡Î¸Ì˚Ï ÍÓÎË˜ÂÒÚ‚ÓÏ ÒÚ‡ÌËˆ, ‚˚ÔÛ˘ÂÌÌ˚ı ÚÂÏ ËÎË ËÌ˚Ï ËÁ‰‡ÚÂÎ¸ÒÚ‚ÓÏ. */
+/*1. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é —Å–ø–∏—Å–æ–∫ –∫–Ω–∏–≥ —Å –º–∏–Ω–∏–º–∞–ª—å–Ω—ã–º –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ–º —Å—Ç—Ä–∞–Ω–∏—Ü, –≤—ã–ø—É—â–µ–Ω–Ω—ã—Ö —Ç–µ–º –∏–ª–∏ –∏–Ω—ã–º –∏–∑–¥–∞—Ç–µ–ª—å—Å—Ç–≤–æ–º. */
 
-CREATE FUNCTION MinPageList
-(
-	@pressName nvarchar(20)
-)
-RETURNS TABLE
-AS
-RETURN
-(
-	SELECT Books.[Name], Books.Pages, Press.[Name]
-	FROM Books JOIN Press
-		ON Books.Id_Press = Press.Id
-
-)
+--CREATE FUNCTION MinPageList()
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT BookMain.[Name] AS BookName, BookMain.Pages, Press.[Name] AS PressName
+--	FROM Books AS BookMain JOIN Press
+--		ON BookMain.Id_Press = Press.Id
+--	WHERE BookMain.Pages = (SELECT MIN(BookSub.Pages) FROM Books AS BookSub WHERE BookMain.Id_Press = BookSub.Id_Press)
+--)
 
 --SELECT *
---FROM MinPageList(N'BHV');
+--FROM MinPageList();
 
-/*2. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ Ì‡Á‚‡ÌËˇ ËÁ‰‡ÚÂÎ¸ÒÚ‚, ÍÓÚÓ˚Â
-‚˚ÔÛÒÚËÎË ÍÌË„Ë ÒÓ ÒÂ‰ÌËÏ ÍÓÎË˜ÂÒÚ‚ÓÏ ÒÚ‡ÌËˆ ·ÓÎ¸¯ËÏ N.
-—Â‰ÌÂÂ ˜ËÒÎÓ ÒÚ‡ÌËˆ ÔÂÂ‰‡∏ÚÒˇ ˜ÂÂÁ Ô‡‡ÏÂÚ.
-3. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ Ó·˘Û˛ ÒÛÏÏÛ ÒÚ‡ÌËˆ ‚ÒÂı
-ËÏÂ˛˘ËıÒˇ ‚ ·Ë·ÎËÓÚÂÍÂ ÍÌË„, ‚˚ÔÛ˘ÂÌÌ˚ı ÛÍ‡Á‡ÌÌ˚Ï
-ËÁ‰‡ÚÂÎ¸ÒÚ‚ÓÏ.
-4. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ÒÔËÒÓÍ ËÏÂÌ Ë Ù‡ÏËÎËÈ ‚ÒÂı
-ÒÚÛ‰ÂÌÚÓ‚, ÍÓÚÓ˚Â ·‡ÎË ÍÌË„Ë ‚ ÔÓÏÂÊÛÚÍÂ ÏÂÊ‰Û ‰‚ÛÏˇ
-ÛÍ‡Á‡ÌÌ˚ÏË ‰‡Ú‡ÏË.
-5. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ÒÔËÒÓÍ ÒÚÛ‰ÂÌÚÓ‚, ÍÚÓ Ì‡
-‰‡ÌÌ˚È ÏÓÏÂÌÚ ‡·ÓÚ‡ÂÚ Ò ÛÍ‡Á‡ÌÌÓÈ ÍÌË„ÓÈ ÓÔÂ‰ÂÎ∏ÌÌÓ„Ó
-‡‚ÚÓ‡.
-6. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ËÌÙÓÏ‡ˆË˛ Ó· ËÁ‰‡ÚÂÎ¸ÒÚ‚‡ı,
-Û ÍÓÚÓ˚ı Ó·˘ÂÂ ÍÓÎË˜ÂÒÚ‚Ó ÒÚ‡ÌËˆ ‚˚ÔÛ˘ÂÌÌ˚ı ËÏË ÍÌË„
-·ÓÎ¸¯Â N.
-7. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ËÌÙÓÏ‡ˆË˛ Ó Ò‡ÏÓÏ
-ÔÓÔÛÎˇÌÓÏ ‡‚ÚÓÂ ÒÂ‰Ë ÒÚÛ‰ÂÌÚÓ‚ Ë Ó ÍÓÎË˜ÂÒÚ‚Â ÍÌË„ ˝ÚÓ„Ó
-‡‚ÚÓ‡, ‚ÁˇÚ˚ı ‚ ·Ë·ÎËÓÚÂÍÂ.
-8. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ÒÔËÒÓÍ ÍÌË„, ÍÓÚÓ˚Â ·‡ÎË Ë
-ÔÂÔÓ‰‡‚‡ÚÂÎË Ë ÒÚÛ‰ÂÌÚ˚.
-9. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ‚ÓÁ‚‡˘‡˛˘Û˛ ÍÓÎË˜ÂÒÚ‚Ó ÒÚÛ‰ÂÌÚÓ‚, ÍÓÚÓ˚Â
-ÌÂ ·‡ÎË ÍÌË„Ë.
-10. Õ‡ÔËÒ‡Ú¸ ÙÛÌÍˆË˛, ÍÓÚÓ‡ˇ ‚ÓÁ‚‡˘‡ÂÚ ÒÔËÒÓÍ
-·Ë·ÎËÓÚÂÍ‡ÂÈ Ë ÍÓÎË˜ÂÒÚ‚Ó ‚˚‰‡ÌÌ˚ı Í‡Ê‰˚Ï ËÁ ÌËı ÍÌË„.*/
+/*2. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é –Ω–∞–∑–≤–∞–Ω–∏—è –∏–∑–¥–∞—Ç–µ–ª—å—Å—Ç–≤, –∫–æ—Ç–æ—Ä—ã–µ –≤—ã–ø—É—Å—Ç–∏–ª–∏ –∫–Ω–∏–≥–∏ —Å–æ —Å—Ä–µ–¥–Ω–∏–º –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ–º —Å—Ç—Ä–∞–Ω–∏—Ü –±–æ–ª—å—à–∏–º N. –°—Ä–µ–¥–Ω–µ–µ —á–∏—Å–ª–æ —Å—Ç—Ä–∞–Ω–∏—Ü –ø–µ—Ä–µ–¥–∞—ë—Ç—Å—è —á–µ—Ä–µ–∑ –ø–∞—Ä–∞–º–µ—Ç—Ä. */
+
+--CREATE FUNCTION AVGPagesPress
+--(
+--	@PagesNum int
+--)
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT Press.[Name] AS PressName, Books.Pages
+--	FROM Press JOIN Books
+--		ON Press.Id = Books.Id_Press
+--	GROUP BY Press.[Name], Books.Pages
+--	HAVING AVG(Books.Pages) > @PagesNum
+--)
+
+--SELECT *
+--FROM AVGPagesPress(200);
+
+/*3. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é –æ–±—â—É—é —Å—É–º–º—É —Å—Ç—Ä–∞–Ω–∏—Ü –≤—Å–µ—Ö –∏–º–µ—é—â–∏—Ö—Å—è –≤ –±–∏–±–ª–∏–æ—Ç–µ–∫–µ –∫–Ω–∏–≥, –≤—ã–ø—É—â–µ–Ω–Ω—ã—Ö —É–∫–∞–∑–∞–Ω–Ω—ã–º –∏–∑–¥–∞—Ç–µ–ª—å—Å—Ç–≤–æ–º. */
+
+--CREATE FUNCTION SUMPages
+--(
+--	@PressName nvarchar(50)
+--)
+--RETURNS int
+--AS
+--BEGIN
+--	DECLARE @ComSum int = 0;
+--	SELECT @ComSum = SUM(Books.Pages)
+--	FROM Books JOIN Press
+--	ON Books.Id_Press = Press.Id
+--	WHERE Press.[Name] = @PressName
+--	RETURN @ComSum
+--END
+
+--DECLARE @temp int = 0;
+--EXEC @temp = SUMPages N'BHV'
+--PRINT @temp
+
+/*4. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é —Å–ø–∏—Å–æ–∫ –∏–º–µ–Ω –∏ —Ñ–∞–º–∏–ª–∏–π –≤—Å–µ—Ö —Å—Ç—É–¥–µ–Ω—Ç–æ–≤, –∫–æ—Ç–æ—Ä—ã–µ –±—Ä–∞–ª–∏ –∫–Ω–∏–≥–∏ –≤ –ø—Ä–æ–º–µ–∂—É—Ç–∫–µ –º–µ–∂–¥—É –¥–≤—É–º—è —É–∫–∞–∑–∞–Ω–Ω—ã–º–∏ –¥–∞—Ç–∞–º–∏. */
+
+--CREATE FUNCTION NameBetTwoDate
+--(
+--	@BeginDate date,
+--	@EndDate date
+--)
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT (Students.FirstName + ' ' + Students.LastName) AS StudName, FORMAT(S_Cards.DateOut, 'dd/MM/yyyy') AS DateOut
+--	FROM Students JOIN S_Cards
+--		ON Students.Id= S_Cards.Id_Student
+--	WHERE @BeginDate <= S_Cards.DateOut AND S_Cards.DateOut <= @EndDate
+--)
+
+--SELECT *
+--FROM NameBetTwoDate(N'19000101', N'20000101')
+
+/*5. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é —Å–ø–∏—Å–æ–∫ —Å—Ç—É–¥–µ–Ω—Ç–æ–≤, –∫—Ç–æ –Ω–∞ –¥–∞–Ω–Ω—ã–π –º–æ–º–µ–Ω—Ç —Ä–∞–±–æ—Ç–∞–µ—Ç —Å —É–∫–∞–∑–∞–Ω–Ω–æ–π –∫–Ω–∏–≥–æ–π –æ–ø—Ä–µ–¥–µ–ª—ë–Ω–Ω–æ–≥–æ –∞–≤—Ç–æ—Ä–∞. */
+
+--CREATE FUNCTION ListStud
+--(
+--	@BooksName nvarchar(100)
+--)
+--RETURNS TABLE 
+--AS
+--RETURN
+--(
+--	SELECT (Students.FirstName + ' ' + Students.LastName) AS StudName, Books.[Name] AS BooksName, (Authors.FirstName + ' ' + Authors.LastName) AS AuthorsName
+--	FROM Students JOIN S_Cards
+--		ON Students.Id = S_Cards.Id_Student
+--		JOIN Books
+--		ON S_Cards.Id_Book = Books.Id
+--		JOIN Authors
+--		ON Authors.Id = Books.Id_Author
+--	WHERE Books.[Name] = @BooksName AND S_Cards.DateIn IS NULL
+--)
+
+--SELECT *
+--FROM ListStud(N'HTML 3.2')
+
+--SELECT Books.[Name]
+--FROM Books;
+
+/*6. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏—é –æ–± –∏–∑–¥–∞—Ç–µ–ª—å—Å—Ç–≤–∞—Ö, —É –∫–æ—Ç–æ—Ä—ã—Ö –æ–±—â–µ–µ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ —Å—Ç—Ä–∞–Ω–∏—Ü –≤—ã–ø—É—â–µ–Ω–Ω—ã—Ö –∏–º–∏ –∫–Ω–∏–≥ –±–æ–ª—å—à–µ N. */
+
+--CREATE FUNCTION PressInf
+--(
+--	@Numpages int
+--)
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT Press.[Name]
+--	FROM Press JOIN Books AS BookMain
+--		ON Press.Id = BookMain.Id_Press
+--	WHERE (SELECT SUM(BookSub.Pages) FROM Books AS BookSub WHERE BookMain.Id_Press = BookSub.Id_Press) > @Numpages
+--	GROUP BY Press.[Name]
+--)
+
+--SELECT *
+--FROM PressInf(200)
+
+/*7. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏—é –æ —Å–∞–º–æ–º –ø–æ–ø—É–ª—è—Ä–Ω–æ–º –∞–≤—Ç–æ—Ä–µ —Å—Ä–µ–¥–∏ —Å—Ç—É–¥–µ–Ω—Ç–æ–≤ –∏ –æ –∫–æ–ª–∏—á–µ—Å—Ç–≤–µ –∫–Ω–∏–≥ —ç—Ç–æ–≥–æ –∞–≤—Ç–æ—Ä–∞, –≤–∑—è—Ç—ã—Ö –≤ –±–∏–±–ª–∏–æ—Ç–µ–∫–µ. */
+
+--CREATE FUNCTION AuthorInf()
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT TOP (1) with ties (Authors.FirstName + ' ' + Authors.LastName) AS AuthorName, COUNT(Books.Id) AS BooksCount
+--	FROM Authors JOIN Books
+--		ON Authors.Id = Books.Id_Author
+--	GROUP BY Authors.FirstName, Authors.LastName
+--	ORDER BY BooksCount DESC
+--)
+
+--SELECT *
+--FROM AuthorInf()
+
+/*8. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é —Å–ø–∏—Å–æ–∫ –∫–Ω–∏–≥, –∫–æ—Ç–æ—Ä—ã–µ –±—Ä–∞–ª–∏ –∏ –ø—Ä–µ–ø–æ–¥–∞–≤–∞—Ç–µ–ª–∏ –∏ —Å—Ç—É–¥–µ–Ω—Ç—ã. */
+
+--CREATE FUNCTION BooksList()
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT Books.[Name], N'–°—Ç—É–¥–µ–Ω—Ç—ã' AS Team
+--	FROM Books JOIN S_Cards
+--		ON Books.Id = S_Cards.Id_Book
+--	UNION
+--	SELECT Books.[Name], N'–£—á–∏—Ç–µ–ª—è' AS Team
+--	FROM Books JOIN T_Cards
+--		ON Books.Id = T_Cards.Id_Book
+--)
+
+--SELECT *
+--FROM BooksList()
+--ORDER BY BooksList.Team
+
+/*9. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –≤–æ–∑–≤—Ä–∞—â–∞—é—â—É—é –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ —Å—Ç—É–¥–µ–Ω—Ç–æ–≤, –∫–æ—Ç–æ—Ä—ã–µ –Ω–µ –±—Ä–∞–ª–∏ –∫–Ω–∏–≥–∏. */
+
+--ALTER FUNCTION CountOfStudNotTake()
+--RETURNS int
+--AS
+--BEGIN
+--	DECLARE @count int = 0;
+--	SELECT @count = (SELECT COUNT(*) FROM Students) - (SELECT COUNT(*) FROM S_Cards)
+
+--	RETURN @count
+--END
+
+--DECLARE @temp int = 0;
+--EXEC @temp = CountOfStudNotTake
+--PRINT @temp
+
+/*10. –ù–∞–ø–∏—Å–∞—Ç—å —Ñ—É–Ω–∫—Ü–∏—é, –∫–æ—Ç–æ—Ä–∞—è –≤–æ–∑–≤—Ä–∞—â–∞–µ—Ç —Å–ø–∏—Å–æ–∫ –±–∏–±–ª–∏–æ—Ç–µ–∫–∞—Ä–µ–π –∏ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ –≤—ã–¥–∞–Ω–Ω—ã—Ö –∫–∞–∂–¥—ã–º –∏–∑ –Ω–∏—Ö –∫–Ω–∏–≥.*/
+
+--CREATE FUNCTION LibsListBooksCount()
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT *
+--	FROM (SELECT (Libs.FirstName + ' ' + Libs.LastName) AS LibsName, COUNT(S_Cards.Id) AS [Count], N'–°—Ç—É–¥–µ–Ω—Ç–æ–≤' AS Team
+--	FROM Libs JOIN S_Cards
+--		ON Libs.Id = S_Cards.Id_Lib
+--	GROUP BY Libs.FirstName, Libs.LastName) AS Stud
+--	UNION
+--	SELECT *
+--	FROM (SELECT (Libs.FirstName + ' ' + Libs.LastName) AS LibsName, COUNT(T_Cards.Id) AS [Count], N'–£—á–∏—Ç–µ–ª–µ–π' AS Team
+--	FROM Libs JOIN T_Cards
+--		ON Libs.Id = T_Cards.Id_Lib
+--	GROUP BY Libs.FirstName, Libs.LastName) AS Teach
+--)
+
+--SELECT *
+--FROM LibsListBooksCount()
+--ORDER BY LibsListBooksCount.Team
