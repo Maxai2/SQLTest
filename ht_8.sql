@@ -84,37 +84,53 @@
 --	ON Books.Id_Category = Categories.Id
 --ORDER BY Themes.Id
 
-/*4. ХП “Добавление студента”. ХП добавляет студента и группу. ХП принимает имя, фамилию студента и название группы. 
+/*4. ??? ХП “Добавление студента”. ХП добавляет студента и группу. ХП принимает имя, фамилию студента и название группы. 
 Если группа с таким названием существует, то в Id_Group указываете Id этой группы. 
 Если группы с таким именем не существует, то сначала добавляем группу, а потом студента. 
 Обратите внимание, что названия групп хранятся в верхнем регистре, но никто не гарантирует, 
 что пользователь передаст название в верхнем регистре. */
 
-CREATE PROCEDURE AddStud
-	@StudFName nvarchar(15),
-	@StudLName nvarchar(15),
-	@GroupName nvarchar(10)
-AS
-BEGIN
+--CREATE PROCEDURE AddStud
+--	@StudFName nvarchar(15),
+--	@StudLName nvarchar(15),
+--	@GroupName nvarchar(10)
+--AS
+--BEGIN
 	
-	DECLARE @IdGroup int = 0;
+--	DECLARE @IdGroup int = 0;
 
-	IF (@GroupName = (SELECT Groups.[Name] FROM Groups))
-	BEGIN
-		SELECT @IdGroup = Groups.Id
-		FROM Groups
-		WHERE Groups.[Name] = @GroupName
-	END
-	ELSE
-	BEGIN
-	END
+--	IF (@GroupName = (SELECT Groups.[Name] FROM Groups))
+--	BEGIN
+--		SELECT @IdGroup = Groups.Id
+--		FROM Groups
+--		WHERE Groups.[Name] = @GroupName
+--	END
+--	ELSE
+--	BEGIN
+--		DECLARE @LastIdGroup int = 0;
+--		SELECT TOP(1) @LastIdGroup = Groups.Id + 1
+--		FROM Groups
+--		ORDER BY Groups.Id DESC
 
-	INSERT INTO Students (IdFirstName, LastName, Id_Group, Term)
-	SELECT @StudFName, @StudLName
+--		INSERT INTO Groups (Id, [Name], Id_Faculty)
+--		VALUES (@LastIdGroup, N'18Б', 1)
 
-END
+--	END
 
+--	DECLARE @LastIdStud int = 0;
+--	SELECT TOP(1) @LastIdStud = Students.Id + 1
+--	FROM Students
+--	ORDER BY Students.Id DESC
 
+--	INSERT INTO Students (Id, FirstName, LastName, Id_Group, Term)
+--	VALUES (@LastIdStud, @StudFName, @StudLName, @IdGroup, 1)
+
+--END
+
+--EXEC AddStud N'Али', N'Махмудов', N'9П1'
+
+--SELECT * 
+--FROM Students
 
 /*5. ХП “Закупка популярных книг”. ХП выбирает топ-5 самых популярных книг (среди
 студентов и преподавателей одновременно) и покупает еще по 3 экземпляра
