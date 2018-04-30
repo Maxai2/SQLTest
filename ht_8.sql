@@ -170,53 +170,97 @@
 выдавать книгу проверяем сколько уже книг на руках у этого студента. Если 3-4
 книги, то выводим предупреждение, а если уже 5 книг, то не выдаем ему новую книгу. */
 
-CREATE PROCEDURE StudTakeBook
-	@StudId int,
+--CREATE PROCEDURE StudTakeBook
+--	@StudId int,
+--	@BookId int
+--AS
+--BEGIN
+--	DECLARE @BookCount int = 0;
+--	SELECT @BookCount = COUNT(*)
+--	FROM Books
+--	WHERE Books.Id = @BookId
+
+--	IF @BookCount > 0
+--	BEGIN
+
+--		DECLARE	@StudBookCount int = 0;
+--		SELECT @StudBookCount = COUNT(*)
+--		FROM S_Cards
+--		WHERE S_Cards.Id_Student = @StudId
+		
+--		DECLARE @StudName nvarchar(60);
+--		SELECT @StudName = Students.FirstName + ' ' + Students.LastName 
+--		FROM Students
+
+--		DECLARE @BookName nvarchar(100)
+--		SELECT @BookName = Books.[Name] 
+--		FROM Books 
+--		WHERE Books.Id = @BookId
+
+--		IF (1 <= @StudBookCount) OR (@StudBookCount <= 4)
+--		BEGIN
+--			IF (@StudBookCount = 3) OR (@StudBookCount = 4)
+--				PRINT @StudName + N' has ' + @StudBookCount + N' books.'
+
+--			DECLARE @LastIdS_Card int = 0;
+--			SELECT TOP(1) @LastIdS_Card = S_Cards.Id + 1
+--			FROM S_Cards
+--			ORDER BY S_Cards.Id DESC
+
+--			INSERT INTO S_Cards (Id, Id_Student, Id_Book, DateOut, DateIn, Id_Lib)
+--			VALUES (@LastIdS_Card, @StudId, @BookId, GETDATE(), NULL, 1)
+
+--			UPDATE Books
+--			SET Books.Quantity -= 1
+--			WHERE Books.Id = @BookId
+--		END
+--		ELSE
+--		IF @StudBookCount >= 5
+--			PRINT @StudName + N' has ' + @StudBookCount + N' books. You exceeded the limit.'
+--	END
+--	ELSE
+--		PRINT N'No more ' + @BookName + N' book.'
+--END
+
+--EXEC StudTakeBook 2, 6
+
+
+--SELECT Books.Id, Books.[Name]
+--FROM Books
+
+--SELECT Students.Id, Students.FirstName
+--FROM Students
+
+/*8. ХП “Преподаватель берет книгу”. */
+
+
+
+/*9. ХП “Студент возвращает книгу”. ХП получает Id студента и Id книги. В таблицу
+S_Cards заносится информация о возвращении книги. Если студент держал у
+себя книгу больше года, то ему выписывается штраф. */
+
+CREATE PROCEDURE StudBooksBack
+	@StudId int, 
 	@BookId int
 AS
 BEGIN
-	DECLARE @BookCount int = 0;
-	SELECT @BookCount = COUNT(*)
-	FROM Books
-	WHERE Books.Id = @BookId
+	UPDATE S_Cards
+	SET S_Cards.DateIn = GETDATE()
+	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
 
-	IF @BookCount > 0
-	BEGIN
+	DECLARE @DateInBook int = 0;
+	SELECT @DateInBook = FORMAT(S_Cards.DateIn, N'yyyy')
+	FROM S_Cards
+	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
 
-		DECLARE	@StudBookCount int = 0;
-		SELECT @StudBookCount = COUNT(*)
-		FROM S_Cards
-		WHERE S_Cards.Id_Student = @StudId
-		
-		DECLARE @StudName nvarchar(60);
-		SELECT @StudName = Students.FirstName + ' ' + Students.LastName 
-		FROM Students
+	DECLARE @DateOutBook int = 0;
+	SELECT @DateOutBook = FORMAT(S_Cards.DateOut, N'yyyy')
+	FROM S_Cards
+	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
 
-		IF (@StudBookCount = 3) OR (@StudBookCount = 4)
-		BEGIN
-			PRINT @StudName + N' has ' + CAST(@StudBookCount, nvarchar(5)) + N' books.'
-
-			DECLARE @LastIdS_Card int = 0;
-			SELECT TOP(1) @LastIdS_Card = Groups.Id + 1
-			FROM Groups
-			ORDER BY Groups.Id DESC
-
-			INSERT INTO S_Cards (Id, Id_Student, Id_Book, DateOut, DateIn, Id_Lib)
-			VALUES ()
-
-			UPDATE Books
-			SET Books.Quantity -= 1
-			WHERE Books.Id = @BookId
-		END
-		ELSE
-		IF @StudBookCount = 5
-			PRINT @StudName + N' has ' + CAST(@StudBookCount, nvarchar(5)) + N' books. You exceeded the limit.'
-	END
+	IF @DateOutBook - @DateInBook > 1
+		PRINT N''
 
 END
 
-/*8. ХП “Преподаватель берет книгу”.
-9. ХП “Студент возвращает книгу”. ХП получает Id студента и Id книги. В таблицу
-S_Cards заносится информация о возвращении книги. Если студент держал у
-себя книгу больше года, то ему выписывается штраф.
-10.ХП “Преподаватель возвращает книгу”.*/
+/*10.ХП “Преподаватель возвращает книгу”. */
