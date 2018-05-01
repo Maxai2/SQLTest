@@ -27,7 +27,16 @@
 --AS
 --BEGIN
 --	DECLARE @temp int = 0
---	SELECT @temp = (SELECT COUNT(*) FROM Students) - (SELECT COUNT(*) FROM S_Cards)
+
+--	SELECT Students.FirstName, Students.LastName
+--	FROM Students FULL OUTER JOIN S_Cards
+--		ON Students.Id = S_Cards.Id_Student
+-- 	WHERE Students.Id IS NULL OR S_Cards.Id_Student IS NULL 
+
+--	SELECT @temp = COUNT(*)
+--	FROM Students FULL OUTER JOIN S_Cards
+--		ON Students.Id = S_Cards.Id_Student
+--	WHERE Students.Id IS NULL OR S_Cards.Id_Student IS NULL 
 
 --	SET @ans = @temp
 --END
@@ -40,18 +49,22 @@
 Кроме того, список должен быть отсортирован по номеру колонки, указанному в 5-м параметре, в направлении, указанном в 6-м параметре. 
 Колонки: 1) идентификатор книги, 2) название книги, 3) фамилия и имя автора, 4) тема, 5) категория. */
 
---CREATE PROCEDURE BooksByParam
+--CREATE PROCEDURE BooksByParam -- нет
 --	@AutorFName nvarchar(15),
 --	@AutorLName nvarchar(15),
 --	@ThemeName nvarchar(15),
---	@CategName nvarchar(15)
+--	@CategName nvarchar(15), 
+--	@ColumnNumber int,
+--	@Direction bit
 --AS
 --BEGIN
---	DECLARE @TempTable TABLE(Id int, BookName nvarchar(30), AuthorName nvarchar(30), ThemeName nvarchar(20), CategName nvarchar(20))
+--	DECLARE @TempTable TABLE(Id int, BookName nvarchar(30), AuthorFName nvarchar(30), AuthorLName nvarchar(30), ThemeName nvarchar(20), CategName nvarchar(20))
 	
+--	DECLARE @OrederBy nvarchar(20)
+
 --	INSERT INTO @TempTable
---	SELECT Books.Id, Books.[Name] AS BookName, (Authors.LastName + ' ' + Authors.FirstName) AS AuthorName, 
---			Themes.[Name] AS ThemeName, Categories.[Name] AS CategName
+--	SELECT Books.Id, Books.[Name] AS BookName, Authors.LastName, Authors.FirstName, 
+			Themes.[Name] AS ThemeName, Categories.[Name] AS CategName
 --	FROM Books JOIN Authors
 --		ON Books.Id_Author = Authors.Id
 --		JOIN Themes
@@ -60,7 +73,22 @@
 --		ON Books.Id_Category = Categories.Id
 --	WHERE Authors.FirstName = @AutorFName AND Authors.LastName = @AutorLName 
 --		AND Themes.[Name] = @ThemeName AND Categories.[Name] = @CategName
---	ORDER BY Categories.Id
+--	ORDER BY
+--	CASE WHEN @ColumnNumber = 1 AND @Direction = 0 THEN Books.Id
+--		WHEN @ColumnNumber = 2 AND @Direction = 0 THEN Books.[Name]
+--		WHEN @ColumnNumber = 3 AND @Direction = 0 THEN Authors.LastName
+--		WHEN @ColumnNumber = 4 AND @Direction = 0 THEN Authors.FirstName
+---		WHEN @ColumnNumber = 5 AND @Direction = 0 THEN Themes.[Name]
+--		WHEN @ColumnNumber = 6 AND @Direction = 0 THEN Categories.[Name]
+--	END ASC,
+
+--	CASE WHEN @ColumnNumber = 1 AND @Direction = 1 THEN Books.Id
+--		WHEN @ColumnNumber = 2 AND @Direction = 1 THEN Books.[Name]
+--		WHEN @ColumnNumber = 3 AND @Direction = 1 THEN Authors.LastName
+--		WHEN @ColumnNumber = 4 AND @Direction = 1 THEN Authors.FirstName
+--		WHEN @ColumnNumber = 5 AND @Direction = 1 THEN Themes.[Name]
+--		WHEN @ColumnNumber = 6 AND @Direction = 1 THEN Categories.[Name]
+--	END DESC
 
 --	SELECT *
 --	FROM @TempTable
