@@ -135,25 +135,26 @@
 /*5. ХП “Закупка популярных книг”. ХП выбирает топ-5 самых популярных книг (среди студентов и преподавателей одновременно)
  и покупает еще по 3 экземпляра книги. */
 
---ALTER PROCEDURE ByeTop5Books
+--CREATE PROCEDURE ByeTop5Books
 --AS
 --BEGIN
 --	UPDATE Books
---	SET Books.Quantity += 0
+--	SET Books.Quantity += 3
 --	WHERE Books.Id IN
 --	(
---		SELECT *
---		FROM (SELECT COUNT(S_Cards.Id_Book) AS BooksCount, Books.[Name], Books.Id, N'Students' AS Team
+--		SELECT TOP(5) Temp.[Name], SUM(Temp.Coun) AS Cou, Temp.Id
+--		FROM (SELECT *
+--		FROM (SELECT COUNT(S_Cards.Id_Book) AS Coun, Books.[Name], Books.Id
 --		FROM S_Cards JOIN Books
 --			ON S_Cards.Id_Book = Books.Id
---		GROUP BY Books.[Name], Books.Id) AS Stud
+--		GROUP BY Books.[Name], Books.Id
 --		UNION
---		SELECT *
---		FROM (SELECT COUNT(T_Cards.Id_Book) AS BooksCount, Books.[Name], Books.Id, N'Teachers' AS Team
+--		SELECT COUNT(T_Cards.Id_Book) AS Coun, Books.[Name], Books.Id
 --		FROM T_Cards JOIN Books
 --			ON T_Cards.Id_Book = Books.Id
---		GROUP BY Books.[Name], Books.Id) AS Teach
---		ORDER BY Team
+--		GROUP BY Books.[Name], Books.Id) AS Main) AS Temp
+--		GROUP BY Temp.[Name], Temp.Id
+--		ORDER BY Cou DESC
 --	) 
 --END
 
@@ -163,7 +164,28 @@
 
 /*6. ХП “Избавление от непопулярных книг”. ХП выбирает топ-5 не популярных книг и отдает половину другому учебному заведению. */
 
-
+--CREATE PROCEDURE LostNoTop5Books
+--AS
+--BEGIN
+--	UPDATE Books
+--	SET Books.Quantity /= 2
+--	WHERE Books.Id IN
+--	(
+--		SELECT TOP(5) Temp.[Name], SUM(Temp.Coun) AS Cou, Temp.Id
+--		FROM (SELECT *
+--		FROM (SELECT COUNT(S_Cards.Id_Book) AS Coun, Books.[Name], Books.Id
+--		FROM S_Cards JOIN Books
+--			ON S_Cards.Id_Book = Books.Id
+--		GROUP BY Books.[Name], Books.Id
+--		UNION
+--		SELECT COUNT(T_Cards.Id_Book) AS Coun, Books.[Name], Books.Id
+--		FROM T_Cards JOIN Books
+--			ON T_Cards.Id_Book = Books.Id
+--		GROUP BY Books.[Name], Books.Id) AS Main) AS Temp
+--		GROUP BY Temp.[Name], Temp.Id
+--		ORDER BY Cou
+--	) 
+--END
 
 /*7. ХП “Студент берет книгу”. ХП получает Id студента и Id книги, проверяет если количество книг больше нуля, 
 тогда выдает студенту книгу. При выдаче студенту книги необходимо уменьшать ее количество в библиотеки. Перед тем как
@@ -176,7 +198,7 @@
 --AS
 --BEGIN
 --	DECLARE @BookCount int = 0;
---	SELECT @BookCount = COUNT(*)
+--	SELECT @BookCount = Books.Quantity
 --	FROM Books
 --	WHERE Books.Id = @BookId
 
@@ -233,34 +255,109 @@
 
 /*8. ХП “Преподаватель берет книгу”. */
 
+--CREATE PROCEDURE TeachTakeBook
+--	@TeachId int,
+--	@BookId int
+--AS
+--BEGIN
+--	DECLARE @BookCount int = 0;
+--	SELECT @BookCount = Books.Quantity
+--	FROM Books
+--	WHERE Books.Id = @BookId
+
+--	IF @BookCount > 0
+--	BEGIN
+
+--		DECLARE	@TeachBookCount int = 0;
+--		SELECT @TeachBookCount = COUNT(*)
+--		FROM T_Cards
+--		WHERE T_Cards.Id_Teacher = @TeachId
+		
+--		DECLARE @TeachName nvarchar(60);
+--		SELECT @TeachName = Teachers.FirstName + ' ' + Teachers.LastName 
+--		FROM Teachers
+
+--		DECLARE @BookName nvarchar(100)
+--		SELECT @BookName = Books.[Name] 
+--		FROM Books 
+--		WHERE Books.Id = @BookId
+
+--		IF (1 <= @TeachBookCount) OR (@TeachBookCount <= 4)
+--		BEGIN
+--			IF (@TeachBookCount = 3) OR (@TeachBookCount = 4)
+--				PRINT @TeachName + N' has ' + @TeachBookCount + N' books.'
+
+--			DECLARE @LastIdT_Card int = 0;
+--			SELECT TOP(1) @LastIdT_Card = T_Cards.Id + 1
+--			FROM T_Cards
+--			ORDER BY T_Cards.Id DESC
+
+--			INSERT INTO T_Cards (Id, Id_Teacher, Id_Book, DateOut, DateIn, Id_Lib)
+--			VALUES (@LastIdT_Card, @TeachId, @BookId, GETDATE(), NULL, 1)
+
+--			UPDATE Books
+--			SET Books.Quantity -= 1
+--			WHERE Books.Id = @BookId
+--		END
+--		ELSE
+--		IF @TeachBookCount >= 5
+--			PRINT @TeachName + N' has ' + @TeachBookCount + N' books. You exceeded the limit.'
+--	END
+--	ELSE
+--		PRINT N'No more ' + @BookName + N' book.'
+--END
 
 
 /*9. ХП “Студент возвращает книгу”. ХП получает Id студента и Id книги. В таблицу
 S_Cards заносится информация о возвращении книги. Если студент держал у
 себя книгу больше года, то ему выписывается штраф. */
 
-CREATE PROCEDURE StudBooksBack
-	@StudId int, 
-	@BookId int
-AS
-BEGIN
-	UPDATE S_Cards
-	SET S_Cards.DateIn = GETDATE()
-	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
+--CREATE PROCEDURE StudBooksBack
+--	@StudId int, 
+--	@BookId int
+--AS
+--BEGIN
+--	UPDATE S_Cards
+--	SET S_Cards.DateIn = GETDATE()
+--	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
 
-	DECLARE @DateInBook int = 0;
-	SELECT @DateInBook = FORMAT(S_Cards.DateIn, N'yyyy')
-	FROM S_Cards
-	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
+--	DECLARE @DateInBook int = 0;
+--	SELECT @DateInBook = FORMAT(S_Cards.DateIn, N'yyyy')
+--	FROM S_Cards
+--	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
 
-	DECLARE @DateOutBook int = 0;
-	SELECT @DateOutBook = FORMAT(S_Cards.DateOut, N'yyyy')
-	FROM S_Cards
-	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
+--	DECLARE @DateOutBook int = 0;
+--	SELECT @DateOutBook = FORMAT(S_Cards.DateOut, N'yyyy')
+--	FROM S_Cards
+--	WHERE S_Cards.Id_Book = @BookId AND S_Cards.Id_Student = @StudId
 
-	IF @DateOutBook - @DateInBook > 1
-		PRINT N''
+--	IF @DateOutBook - @DateInBook > 1
+--		PRINT N'You exceeded the limit of book use by' + (@DateOutBook - @DateInBook) + N' years.'
 
-END
+--END
 
 /*10.ХП “Преподаватель возвращает книгу”. */
+
+--CREATE PROCEDURE TeachBooksBack
+--	@StudId int, 
+--	@BookId int
+--AS
+--BEGIN
+--	UPDATE T_Cards
+--	SET T_Cards.DateIn = GETDATE()
+--	WHERE T_Cards.Id_Book = @BookId AND T_Cards.Id_Teacher = @StudId
+
+--	DECLARE @DateInBook int = 0;
+--	SELECT @DateInBook = FORMAT(T_Cards.DateIn, N'yyyy')
+--	FROM T_Cards
+--	WHERE T_Cards.Id_Book = @BookId AND T_Cards.Id_Teacher = @StudId
+
+--	DECLARE @DateOutBook int = 0;
+--	SELECT @DateOutBook = FORMAT(T_Cards.DateOut, N'yyyy')
+--	FROM T_Cards
+--	WHERE T_Cards.Id_Book = @BookId AND T_Cards.Id_Teacher = @StudId
+
+--	IF @DateOutBook - @DateInBook > 1
+--		PRINT N'You exceeded the limit of book use by' + (@DateOutBook - @DateInBook) + N' years.'
+
+--END
