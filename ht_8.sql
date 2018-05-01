@@ -64,7 +64,7 @@
 
 --	INSERT INTO @TempTable
 --	SELECT Books.Id, Books.[Name] AS BookName, Authors.LastName, Authors.FirstName, 
-			Themes.[Name] AS ThemeName, Categories.[Name] AS CategName
+--			Themes.[Name] AS ThemeName, Categories.[Name] AS CategName
 --	FROM Books JOIN Authors
 --		ON Books.Id_Author = Authors.Id
 --		JOIN Themes
