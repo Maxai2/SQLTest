@@ -212,41 +212,105 @@
 	   
 --SET IDENTITY_INSERT Schedule OFF
 
-SET IDENTITY_INSERT Student ON
+--SET IDENTITY_INSERT Student ON
 
-INSERT INTO Student (Id, First_Name, Last_Name, Birth_Date, Group_Id, Number, Email)
-VALUES (1, N'Дементий', N'Вирский', N'1992-01-09', 3, N'8 (914) 918-60-48', N'demvir@gmail.com'),
-	   (2, N'Инесса', N'Мамедова', N'1992-01-05', 3, N'8 (959) 685-71-65', N'inemam@gmail.com'),
-	   (3, N'Парамон', N'Шалдыбин', N'1997-05-21', 3, N'8 (942) 550-86-29', N'parjal@gmail.com'),
-	   (4, N'Инна', N'Усачёва', N'1991-08-08', 3, N'8 (977) 758-71-31', N'innusa@gmail.com'),
-	   (5, N'Глеб', N'Мамедов', N'1996-12-01', 3, N'8 (971) 589-92-49', N'qlemam@gmail.com'),
-	   (6, N'Наталья', N'Кулагина', N'1993-07-20', 4, N'8 (915) 976-90-40', N'natkul@gmail.com'),
-	   (7, N'Константин', N'Секунов', N'1992-08-10', 4, N'8 (971) 251-60-32', N'konsek@gmail.com'),
-	   (8, N'Зосима', N'Крылов', N'1991-01-23', 4, N'8 (909) 627-98-48', N'zoskri@gmail.com'),
-	   (9, N'Роза', N'Соболева', N'1998-05-19', 4, N'8 (953) 522-66-91', N'rozsob@gmail.com'),
-	   (10, N'Леокадия', N'Данилова', N'1997-10-03', 4, N'8 (954) 977-46-78', N'leodan@gmail.com'),
-	   (11, N'Велимир', N'Кириллов', N'1999-12-18', 5, N'8 (971) 942-37-46', N'velkir@gmail.com'),
-	   (12, N'Нина', N'Конягина', N'1992-04-11', 5, N'8 (926) 223-63-28', N'ninkon@gmail.com'),
-	   (13, N'Александра', N'Усачёва', N'1993-10-26', 5, N'8 (930) 166-34-74', N'aleusa@gmail.com'),
-	   (14, N'Максимильян', N'Троицкий', N'1994-02-22', 5, N'8 (928) 218-35-91', N'maktro@gmail.com'),
-	   (15, N'Валентина', N'Яковлева', N'1993-09-16', 5, N'8 (924) 986-36-61', N'valyako@gmail.com'),
-	   (16, N'Руслан', N'Иванов', N'1998-03-08', 6, N'8 (906) 119-99-20', N'rusiva@gmail.com'),
-	   (17, N'Виссарион', N'Миронов', N'1994-02-07', 6, N'8 (971) 649-38-48', N'vismir@gmail.com'),
-	   (18, N'Инна', N'Орлова', N'1990-12-04', 6, N'8 (974) 516-79-29', N'innorl@gmail.com'),
-	   (19, N'Евгения', N'Васильева', N'1990-01-08', 6, N'8 (919) 616-40-29', N'yevgvas@gmail.com'),
-	   (20, N'Нестор', N'Морозов', N'1994-04-19', 6, N'8 (977) 275-29-88', N'nesmor@gmail.com'),
-	   (21, N'Флора', N'Крылова', N'1992-08-18', 7, N'8 (940) 704-34-76', N'flokir@gmail.com'),
-	   (22, N'Арефий', N'Леонов', N'1995-07-23', 7, N'8 (902) 599-97-29', N'areleo@gmail.com'),
-	   (23, N'Арефий', N'Леонов', N'1995-07-23', 7, N'8 (902) 599-97-29', N'areleo@gmail.com'),
+--INSERT INTO Student (Id, First_Name, Last_Name, Birth_Date, Group_Id, Number, Email)
+--VALUES (1, N'Дементий', N'Вирский', N'1992-01-09', 3, N'8 (914) 918-60-48', N'demvir@gmail.com'),
+--	   (2, N'Инесса', N'Мамедова', N'1992-01-05', 3, N'8 (959) 685-71-65', N'inemam@gmail.com'),
+--	   (3, N'Парамон', N'Шалдыбин', N'1997-05-21', 3, N'8 (942) 550-86-29', N'parjal@gmail.com'),
+--	   (4, N'Инна', N'Усачёва', N'1991-08-08', 3, N'8 (977) 758-71-31', N'innusa@gmail.com'),
+--	   (5, N'Глеб', N'Мамедов', N'1996-12-01', 3, N'8 (971) 589-92-49', N'qlemam@gmail.com'),
+--	   (6, N'Наталья', N'Кулагина', N'1993-07-20', 4, N'8 (915) 976-90-40', N'natkul@gmail.com'),
+--	   (7, N'Константин', N'Секунов', N'1992-08-10', 4, N'8 (971) 251-60-32', N'konsek@gmail.com'),
+--	   (8, N'Зосима', N'Крылов', N'1991-01-23', 4, N'8 (909) 627-98-48', N'zoskri@gmail.com'),
+--	   (9, N'Роза', N'Соболева', N'1998-05-19', 4, N'8 (953) 522-66-91', N'rozsob@gmail.com'),
+--	   (10, N'Леокадия', N'Данилова', N'1997-10-03', 4, N'8 (954) 977-46-78', N'leodan@gmail.com'),
+--	   (11, N'Велимир', N'Кириллов', N'1999-12-18', 5, N'8 (971) 942-37-46', N'velkir@gmail.com'),
+--	   (12, N'Нина', N'Конягина', N'1992-04-11', 5, N'8 (926) 223-63-28', N'ninkon@gmail.com'),
+--	   (13, N'Александра', N'Усачёва', N'1993-10-26', 5, N'8 (930) 166-34-74', N'aleusa@gmail.com'),
+--	   (14, N'Максимильян', N'Троицкий', N'1994-02-22', 5, N'8 (928) 218-35-91', N'maktro@gmail.com'),
+--	   (15, N'Валентина', N'Яковлева', N'1993-09-16', 5, N'8 (924) 986-36-61', N'valyako@gmail.com'),
+--	   (16, N'Руслан', N'Иванов', N'1998-03-08', 6, N'8 (906) 119-99-20', N'rusiva@gmail.com'),
+--	   (17, N'Виссарион', N'Миронов', N'1994-02-07', 6, N'8 (971) 649-38-48', N'vismir@gmail.com'),
+--	   (18, N'Инна', N'Орлова', N'1990-12-04', 6, N'8 (974) 516-79-29', N'innorl@gmail.com'),
+--	   (19, N'Евгения', N'Васильева', N'1990-01-08', 6, N'8 (919) 616-40-29', N'yevgvas@gmail.com'),
+--	   (20, N'Нестор', N'Морозов', N'1994-04-19', 6, N'8 (977) 275-29-88', N'nesmor@gmail.com'),
+--	   (21, N'Флора', N'Крылова', N'1992-08-18', 7, N'8 (940) 704-34-76', N'flokir@gmail.com'),
+--	   (22, N'Арефий', N'Леонов', N'1995-07-23', 7, N'8 (902) 599-97-29', N'areleo@gmail.com'),
+--	   (23, N'Иннокентий', N'Шмидт', N'1994-02-06', 7, N'8 (946) 810-71-55', N'innjmi@gmail.com'),
+--	   (24, N'Эвелина', N'Демьянова', N'1992-12-09', 7, N'8 (941) 785-34-46', N'evadem@gmail.com'),
+--	   (25, N'Нифонт', N'Федотов', N'1996-02-27', 7, N'8 (935) 177-76-99', N'niffed@gmail.com')
 
-SELECT *
-FROM [Group]
+--SET IDENTITY_INSERT Student OFF
+-------------------------------------------------------------------------------------------------------
 
-SET IDENTITY_INSERT Schedule OFF
+/*1. Вывод подробной информации о студентах в указанной группе. */
+
+--CREATE FUNCTION ShowGroupInfo
+--( @groupName nvarchar(20) )
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT Student.First_Name, Student.Last_Name, Student.Birth_Date, [Group].Group_Name, Student.Number, Student.Email
+--	FROM Student JOIN [Group]
+--		ON Student.Group_Id = [Group].Id
+--	WHERE [Group].Group_Name = @groupName
+--)
 
 --SELECT *
---FROM Lecture_Hall
+--FROM ShowGroupInfo(N'FBM-1711-ru')
+
+/*2. Вывод сотрудников по указанной должности. */
+
+--CREATE FUNCTION ShowEmployeesPost
+--( @postName nvarchar(20) )
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT Employees.First_Name, Employees.Last_Name, Employees.Birth_Date, Employees.Number, Employees.Email, Post.Post_Name
+--	FROM Employees JOIN Post_Employees
+--		ON Employees.Id = Post_Employees.Employees_Id
+--		JOIN Post
+--		ON Post.Id = Post_Employees.Post_Id
+--	WHERE Post.Post_Name = @postName
+--)
 
 --SELECT *
---FROM Couple
+--FROM ShowEmployeesPost(N'Заведующий кафедрой')
 
+/*3. Вывод расписания на неделю в понятном и подробном виде для указанной группы. */
+
+--CREATE FUNCTION ShowSheduleInfo
+--( @groupName nvarchar(20) )
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT [Subject].Subject_Name, Lecture_Hall.Hall_Num, [Group].Group_Name, Employees.First_Name, Employees.Last_Name, Schedule.[Date], Couple.Couple_Num, Couple.Couple_STime, Couple.Couple_FTime 
+--	FROM Schedule JOIN [Subject]
+--		ON Schedule.Subject_Id = [Subject].Id
+--		JOIN Lecture_Hall
+--		ON Schedule.Lecture_Hall_Id = Lecture_Hall.Id
+--		JOIN [Group]
+--		ON Schedule.Group_Id = [Group].Id
+--		JOIN Employees
+--		ON Schedule.Employees_Id = Employees.Id
+--		JOIN Couple
+--		ON Schedule.Couple_Id = Couple.Id
+--	WHERE [Group].Group_Name = @groupName
+--)
+
+--SELECT *
+--FROM ShowSheduleInfo(N'FBM-1711-ru')
+
+/*4. Вывод расписания на неделю в понятном и подробном виде для указанного преподавателя. */
+
+
+
+/*5. Вывод расписания на неделю в понятном и подробном виде для указанной аудитории. */
+
+
+
+/*6. Подсчет зарплаты указанного преподавателя за 1 месяц (зарплата - это количество пар умноженное на ставку за 1 пару; считаем, что 1 месяц - это ровно 4 недели).*/
