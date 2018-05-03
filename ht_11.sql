@@ -307,10 +307,81 @@
 
 /*4. Вывод расписания на неделю в понятном и подробном виде для указанного преподавателя. */
 
+--CREATE FUNCTION ShowSheduleForTeacherInfo
+--( 
+--	@TeacherFName nvarchar(20),
+--	@TeacherLName nvarchar(20)
+--)
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT [Subject].Subject_Name, Lecture_Hall.Hall_Num, [Group].Group_Name, Employees.First_Name, 
+--			Employees.Last_Name, Schedule.[Date], Couple.Couple_Num, Couple.Couple_STime, Couple.Couple_FTime
+--	FROM Schedule JOIN [Subject]
+--		ON Schedule.Subject_Id = [Subject].Id
+--		JOIN Lecture_Hall
+--		ON Schedule.Lecture_Hall_Id = Lecture_Hall.Id
+--		JOIN [Group]
+--		ON Schedule.Group_Id = [Group].Id
+--		JOIN Employees
+--		ON Schedule.Employees_Id = Employees.Id
+--		JOIN Couple
+--		ON Schedule.Couple_Id = Couple.Id
+--	WHERE Employees.First_Name = @TeacherFName AND Employees.Last_Name = @TeacherLName
+--)
 
+--SELECT *
+--FROM ShowSheduleForTeacherInfo(N'Мальвина', N'Кулагина')
 
 /*5. Вывод расписания на неделю в понятном и подробном виде для указанной аудитории. */
 
+--CREATE FUNCTION ShowSheduleForLecHallInfo
+--( 
+--	@LecHallNum nvarchar(5)
+--)
+--RETURNS TABLE
+--AS
+--RETURN
+--(
+--	SELECT [Subject].Subject_Name, Lecture_Hall.Hall_Num, [Group].Group_Name, Employees.First_Name, 
+--			Employees.Last_Name, Schedule.[Date], Couple.Couple_Num, Couple.Couple_STime, Couple.Couple_FTime
+--	FROM Schedule JOIN [Subject]
+--		ON Schedule.Subject_Id = [Subject].Id
+--		JOIN Lecture_Hall
+--		ON Schedule.Lecture_Hall_Id = Lecture_Hall.Id
+--		JOIN [Group]
+--		ON Schedule.Group_Id = [Group].Id
+--		JOIN Employees
+--		ON Schedule.Employees_Id = Employees.Id
+--		JOIN Couple
+--		ON Schedule.Couple_Id = Couple.Id
+--	WHERE Lecture_Hall.Hall_Num = @LecHallNum
+--)
 
+--SELECT *
+--FROM ShowSheduleForLecHallInfo(N'1A')
 
 /*6. Подсчет зарплаты указанного преподавателя за 1 месяц (зарплата - это количество пар умноженное на ставку за 1 пару; считаем, что 1 месяц - это ровно 4 недели).*/
+
+--CREATE FUNCTION TeachSalCounter
+--( 
+--	@TeachFName nvarchar(20),
+--	@TeachLName nvarchar(20)
+--)
+--RETURNS int
+--AS
+--BEGIN
+--	DECLARE @Sal int = 0;
+--	SELECT @Sal = Post_Employees.Amount / (SELECT COUNT(*) FROM Schedule WHERE Schedule.Employees_Id = (SELECT Employees.Id FROM Employees WHERE Employees.First_Name = @TeachFName AND Employees.Last_Name = @TeachLName))
+--	FROM Post_Employees JOIN Employees
+--		ON Post_Employees.Employees_Id = Employees.Id
+--	WHERE Employees.First_Name = @TeachFName AND Employees.Last_Name = @TeachLName
+
+--	RETURN @Sal
+--END
+
+--DECLARE @TempSal int = 0;
+--EXEC @TempSal = TeachSalCounter N'Никон', N'Мартынов'
+
+--PRINT @TempSal
