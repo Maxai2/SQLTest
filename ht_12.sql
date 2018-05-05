@@ -95,24 +95,39 @@
 
 /*4. Нельзя выдать более трёх книг одному студенту на руки.*/
 
-CREATE TRIGGER NoMoreThanThree
-ON S_Cards AFTER INSERT
-AS
-BEGIN
+--CREATE TRIGGER NoMoreThanThree
+--ON S_Cards AFTER INSERT
+--AS
+--BEGIN
+--	DECLARE @curStudBookCount int = 0;
+--	SELECT @curStudBookCount = COUNT(inserted.Id_Student)
+--	FROM inserted JOIN Students
+--		ON inserted.Id_Student = Students.Id
+--	WHERE Students.Id = inserted.Id_Student
 
-	DECLARE @curStudBookCount int = 0;
-	SELECT @curStudBookCount = COUNT(inserted.Id_Student)
-	FROM inserted JOIN Students
-		ON inserted.Id_Student = Students.Id
-	WHERE Students.Id = inserted.Id_Student
+--	IF @curStudBookCount > 3
+--	BEGIN
+--		PRINT N'You have 3 books no longer issued!'
+--		ROLLBACK TRAN
+--	END
+--	ELSE
+--		PRINT N'Take please!'
+--END
 
-	IF @curStudBookCount > 3
-	BEGIN
-		PRINT N''
-	END
+/*5. Нельзя выдавать новую книгу студенту, если он сейчас читает хоть одну книгу дольше 2 месяцев. */
 
-END
+--CREATE TRIGGER TwoMonthMore
+--ON S_Cards AFTER INSERT
+--AS
+--BEGIN
+--	DECLARE @monthCount int = 0;
+--	SELECT @monthCount = MONTH(GETDATE()) - (SELECT MONTH(inserted.DateOut) FROM inserted)
+--END
 
-/*5. Нельзя выдавать новую книгу студенту, если он сейчас читает хоть одну книгу дольше 2 месяцев.
-6. При удалении книги, данные о ней должны копироваться в таблицу LibDeleted.
+DECLARE @monthCount int = 0;
+SELECT @monthCount = MONTH(GETDATE()) - (SELECT TOP(1) MONTH(S_Cards.DateOut) FROM S_Cards WHERE S_Cards.Id_Student = 2)
+PRINT @monthCount
+
+/*6. При удалении книги, данные о ней должны копироваться в таблицу LibDeleted.
+
 (!) Обратите внимание, что первые 3 пункта относятся к выдаче книг и студентам и учителям.*/
