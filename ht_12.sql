@@ -124,10 +124,35 @@
 --	SELECT @monthCount = MONTH(GETDATE()) - (SELECT MONTH(inserted.DateOut) FROM inserted)
 --END
 
-DECLARE @monthCount int = 0;
-SELECT @monthCount = MONTH(GETDATE()) - (SELECT TOP(1) MONTH(S_Cards.DateOut) FROM S_Cards WHERE S_Cards.Id_Student = 2)
-PRINT @monthCount
+--DECLARE @monthCount int = 0;
+--SELECT @monthCount = MONTH(GETDATE()) - (SELECT TOP(1) MONTH(S_Cards.DateOut) FROM S_Cards WHERE S_Cards.Id_Student = 2)
+--PRINT @monthCount
 
-/*6. При удалении книги, данные о ней должны копироваться в таблицу LibDeleted.
+/*6. При удалении книги, данные о ней должны копироваться в таблицу LibDeleted. */
 
-(!) Обратите внимание, что первые 3 пункта относятся к выдаче книг и студентам и учителям.*/
+CREATE TABLE LibDeleted
+(
+	Id int NOT NULL IDENTITY(1, 1),
+	[Name] nvarchar(100) NOT NULL,
+	Pages int NOT NULL,
+	YearPress int NOT NULL,
+	Id_Themes int NOT NULL,
+	Id_Category int NOT NULL,
+	Id_Author int NOT NULL,
+	Id_Press int NOT NULL,
+	Comment nvarchar(50) NULL,
+	Quantity int NOT NULL
+)
+GO
+CREATE TRIGGER OnDeleteCopy
+ON Books AFTER DELETE
+AS
+BEGIN
+	INSERT INTO LibDeleted ([Name], Pages, YearPress, Id_Themes, Id_Category, Id_Author, Id_Press, Comment, Quantity)
+	VALUE (deleted.[Name], deleted.Pages, deleted.YearPress, deleted.Id_Themes, deleted.Id_Category, deleted.Id_Author, deleted.Id_Press, deleted.Comment, deleted.Quantity)
+END
+
+SELECT *
+FROM Books
+
+/*(!) Обратите внимание, что первые 3 пункта относятся к выдаче книг и студентам и учителям.*/
