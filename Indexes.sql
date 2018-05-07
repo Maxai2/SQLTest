@@ -43,4 +43,15 @@ END;
 SELECT *
 FROM TableInHeap
 
+SELECT * FROM TableInHeap
+WHERE Id = 160000 --00.031
+
+CREATE CLUSTERED INDEX Index1 
+ON TableInHeap (Id)
+
+DROP INDEX TableInHeap.Index1
+
+CREATE NONCLUSTERED INDEX Index1 
+ON TableInHeap (Id)
+
 EXEC ShowInfo_TableInHeap;
