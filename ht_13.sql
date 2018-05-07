@@ -17,23 +17,101 @@ BEGIN
 	UPDATE PostRating
 	SET PostRating.Mark = @mark
 	WHERE PostRating.IdPost = @idPost AND PostRating.IdUser = @idUser
+	
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when set mark for Post Rating!';
+		ROLLBACK TRAN PostMarkTran
+		RETURN
+	END
+
+	DECLARE @UserRating int = 0;
+	SELECT @UserRating = AVG(@mark + Users.Rating)
+	FROM Users
+	WHERE Users.Id = @idUser
 
 	UPDATE Users
-	SET Users.Rating = 
+	SET Rating = @UserRating
+	WHERE Users.Id = @idUser
+
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when set rating for Users!';
+		ROLLBACK TRAN PostMarkTran
+		RETURN
+	END
+
+	DECLARE @PostRating int = 0;
+	SELECT @PostRating = AVG(@mark + Posts.Rating)
+	FROM Posts
+	WHERE Posts.Id = @idPost
+
+	UPDATE Posts
+	SET Rating = @PostRating
+	WHERE Posts.Id = @idPost
+
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when set rating for Posts!';
+		ROLLBACK TRAN PostMarkTran
+		RETURN
+	END
 
 	COMMIT TRAN PostMarkTran
 END
 
-SELECT *
+-----------------------------------------------------------------------------------
 
+CREATE PROCEDURE CommentMark
+	@idComment int,
+	@idUser int,
+	@mark int
+AS
+BEGIN
+	BEGIN TRAN CommentMarkTran
 
---CREATE PROCEDURE PostMark
---	@idPost int,
---	@idUser int,
---	@mark int
---AS
---BEGIN
---	UPDATE PostRating
---	SET PostRating.Mark = @mark
---	WHERE PostRating.IdPost = @idPost AND PostRating.IdUser = @idUser
---END
+	UPDATE CommentRating
+	SET CommentRating.Mark = @mark
+	WHERE CommentRating.IdComment = @idComment AND CommentRating.IdUser = @idUser
+	
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when set mark for Post Rating!';
+		ROLLBACK TRAN CommentMarkTran
+		RETURN
+	END
+
+	DECLARE @UserRating int = 0;
+	SELECT @UserRating = AVG(@mark + Users.Rating)
+	FROM Users
+	WHERE Users.Id = @idUser
+
+	UPDATE Users
+	SET Rating = @UserRating
+	WHERE Users.Id = @idUser
+
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when set rating for Users!';
+		ROLLBACK TRAN PostMarkTran
+		RETURN
+	END
+
+	DECLARE @PostRating int = 0;
+	SELECT @PostRating = AVG(@mark + Posts.Rating)
+	FROM Posts
+	WHERE Posts.Id = @idPost
+
+	UPDATE Posts
+	SET Rating = @PostRating
+	WHERE Posts.Id = @idPost
+
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when set rating for Posts!';
+		ROLLBACK TRAN PostMarkTran
+		RETURN
+	END
+
+	COMMIT TRAN PostMarkTran
+END
