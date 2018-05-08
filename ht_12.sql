@@ -29,23 +29,28 @@ BEGIN
 	DECLARE @monthCount int = 0;
 	SELECT @monthCount = MONTH(GETDATE()) - (SELECT TOP(1) MONTH(inserted.DateOut) FROM inserted)
 
+	IF @bookQuant = 0
+	BEGIN
+		PRINT 'No more (' + @bookName + ') left in the library!'
+		ROLLBACK TRAN;	
+	END
+	ELSE
+	IF @curStudBookCount > 3
+	BEGIN
+		PRINT N'You have 3 books no longer issued!'
+		ROLLBACK TRAN
+	END
+
+	WHILE (SELECT * FROM S_Cards JOIN inserted ON S_Cards.Id = inserted.Id WHERE S_Cards.Id_Student = inserted.Id_Student) > 0
+	BEGIN
+		
+	END
+
 	IF (YEAR(GETDATE()) - (SELECT TOP(1) YEAR(inserted.DateOut) FROM inserted)) = 0
 	BEGIN
 		IF @monthCount > 2
 		BEGIN
 			PRINT N'You have exceeded the storage limit of the book by month!'
-			ROLLBACK TRAN
-		END
-		ELSE
-		IF @bookQuant = 0
-		BEGIN
-			PRINT 'No more (' + @bookName + ') left in the library!'
-			ROLLBACK TRAN;
-		END
-		ELSE
-		IF @curStudBookCount > 3
-		BEGIN
-			PRINT N'You have 3 books no longer issued!'
 			ROLLBACK TRAN
 		END
 		ELSE
