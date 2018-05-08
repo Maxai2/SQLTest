@@ -1,9 +1,11 @@
 /*Реализовать триггеры таким образом, чтоб выполнялись следующие требования. 
 1. Нельзя было выдавать книгу, которой уже нет в библиотеке (по количеству). */
 /*3. При выдаче книги, ее количество должно уменьшаться.*/
+/*4. Нельзя выдать более трёх книг одному студенту на руки.*/
+/*5. Нельзя выдавать новую книгу студенту, если он сейчас читает хоть одну книгу дольше 2 месяцев. */
 
 CREATE TRIGGER CheckBookGiveStud 
-ON S_Cards AFTER INSERT
+ON S_Cards AFTER INSERT, UPDATE
 AS
 BEGIN
 	DECLARE @bookQuant int = 0;
@@ -18,18 +20,48 @@ BEGIN
 		ON Books.Id = inserted.Id_Book 
 	WHERE inserted.Id_Book = Books.Id
 
-	IF @bookQuant = 0
+	DECLARE @curStudBookCount int = 0;
+	SELECT @curStudBookCount = COUNT(inserted.Id_Student)
+	FROM inserted JOIN Students
+		ON inserted.Id_Student = Students.Id
+	WHERE Students.Id = inserted.Id_Student
+
+	DECLARE @monthCount int = 0;
+	SELECT @monthCount = MONTH(GETDATE()) - (SELECT TOP(1) MONTH(inserted.DateOut) FROM inserted)
+
+	IF (YEAR(GETDATE()) - (SELECT TOP(1) YEAR(inserted.DateOut) FROM inserted)) = 0
 	BEGIN
-		PRINT 'No more (' + @bookName + ') left in the library!'
-		ROLLBACK TRAN;
+		IF @monthCount > 2
+		BEGIN
+			PRINT N'You have exceeded the storage limit of the book by month!'
+			ROLLBACK TRAN
+		END
+		ELSE
+		IF @bookQuant = 0
+		BEGIN
+			PRINT 'No more (' + @bookName + ') left in the library!'
+			ROLLBACK TRAN;
+		END
+		ELSE
+		IF @curStudBookCount > 3
+		BEGIN
+			PRINT N'You have 3 books no longer issued!'
+			ROLLBACK TRAN
+		END
+		ELSE
+		BEGIN
+			PRINT 'Take please!'
+			UPDATE Books
+			SET Quantity -= 1
+			WHERE Books.Id = ANY (SELECT inserted.Id_Book FROM inserted)
+		END
 	END
 	ELSE
 	BEGIN
-		PRINT 'Take please!'
-		UPDATE Books
-		SET Quantity -= 1
-		WHERE Books.Id = ANY (SELECT inserted.Id_Book FROM inserted)
+		PRINT N'You have exceeded the storage limit of the book by year!'
+		ROLLBACK TRAN
 	END
+
 END
 
 ---------------------------------------------------------------------------------
@@ -99,76 +131,6 @@ BEGIN
 END
 
 ----------------------------------------------------------------
-
---UPDATE S_Cards
---SET S_Cards.DateIn = GETDATE()
---WHERE S_Cards.Id = 11
-
---INSERT INTO S_Cards (Id, Id_Student, Id_Lib, Id_Book, DateOut, DateIn)
---VALUES (132, 6, 1, 14, GETDATE(), NULL)
-
---SELECT *
---FROM S_Cards
-
---SELECT *
---FROM Books
-
---UPDATE Books
---SET Books.Quantity -= 1
-
-----------------------------------------------------------------------------
-
-/*4. Нельзя выдать более трёх книг одному студенту на руки.*/
-
-CREATE TRIGGER NoMoreThanThree
-ON S_Cards AFTER INSERT
-AS
-BEGIN
-	DECLARE @curStudBookCount int = 0;
-	SELECT @curStudBookCount = COUNT(inserted.Id_Student)
-	FROM inserted JOIN Students
-		ON inserted.Id_Student = Students.Id
-	WHERE Students.Id = inserted.Id_Student
-
-	IF @curStudBookCount > 3
-	BEGIN
-		PRINT N'You have 3 books no longer issued!'
-		ROLLBACK TRAN
-	END
-	ELSE
-		PRINT N'Take please!'
-END
-
-/*5. Нельзя выдавать новую книгу студенту, если он сейчас читает хоть одну книгу дольше 2 месяцев. */
-
-CREATE TRIGGER TwoMonthMore
-ON S_Cards AFTER INSERT
-AS
-BEGIN
-	IF (YEAR(GETDATE()) - (SELECT TOP(1) YEAR(inserted.DateOut) FROM inserted)) = 0
-	BEGIN
-		DECLARE @monthCount int = 0;
-		SELECT @monthCount = MONTH(GETDATE()) - (SELECT TOP(1) MONTH(inserted.DateOut) FROM inserted)
-
-		IF @monthCount > 2
-		BEGIN
-			PRINT N'You have exceeded the storage limit of the book by month!'
-			ROLLBACK TRAN
-			RETURN
-		END
-		ELSE
-		BEGIN
-			PRINT 'Take please!'
-			UPDATE Books
-			SET Quantity -= 1
-			WHERE Books.Id = ANY (SELECT inserted.Id_Book FROM inserted)
-		END
-	END
-	
-	PRINT N'You have exceeded the storage limit of the book by year!'
-	ROLLBACK TRAN
-
-END
 
 /*6. При удалении книги, данные о ней должны копироваться в таблицу LibDeleted. */
 
