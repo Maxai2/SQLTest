@@ -14,29 +14,12 @@ AS
 BEGIN
 	BEGIN TRAN PostMarkTran
 
-	INSERT PostRating
-	SET PostRating.Mark = @mark
-	WHERE PostRating.IdPost = @idPost AND PostRating.IdUser = @idUser
-	
+	INSERT INTO PostRating (IdPost, IdUser, Mark)
+	VALUES (@idPost, @idUser, @mark)
+		
 	IF	@@ERROR != 0
 	BEGIN
-		PRINT N'Error when set mark for Post Rating!';
-		ROLLBACK TRAN PostMarkTran
-		RETURN
-	END
-
-	DECLARE @UserRating int = 0;
-	SELECT @UserRating = AVG(@mark + Users.Rating)
-	FROM Users
-	WHERE Users.Id = @idUser
-
-	UPDATE Users
-	SET Rating = @UserRating
-	WHERE Users.Id = @idUser
-
-	IF	@@ERROR != 0
-	BEGIN
-		PRINT N'Error when set rating for Users!';
+		PRINT N'Error when insert for Post Rating!';
 		ROLLBACK TRAN PostMarkTran
 		RETURN
 	END
@@ -52,7 +35,24 @@ BEGIN
 
 	IF	@@ERROR != 0
 	BEGIN
-		PRINT N'Error when set rating for Posts!';
+		PRINT N'Error when recalc rating for Posts!';
+		ROLLBACK TRAN PostMarkTran
+		RETURN
+	END
+
+	DECLARE @UserRating int = 0;
+	SELECT @UserRating = AVG(Posts.Rating + Users.Rating)
+	FROM Users JOIN Posts
+		ON Users.Id = Posts.IdUser
+	WHERE Users.Id = @idUser
+
+	UPDATE Users
+	SET Rating = @UserRating
+	WHERE Users.Id = @idUser
+
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when recalc rating for Users!';
 		ROLLBACK TRAN PostMarkTran
 		RETURN
 	END
@@ -70,45 +70,12 @@ AS
 BEGIN
 	BEGIN TRAN CommentMarkTran
 
-	UPDATE CommentRating
-	SET CommentRating.Mark = @mark
-	WHERE CommentRating.IdComment = @idComment AND CommentRating.IdUser = @idUser
-	
+	INSERT INTO CommentRating (IdComment, IdUser, Mark)
+	VALUES (@idComment, @idUser, @mark)
+		
 	IF	@@ERROR != 0
 	BEGIN
-		PRINT N'Error when set mark for Post Rating!';
-		ROLLBACK TRAN CommentMarkTran
-		RETURN
-	END
-
-	DECLARE @UserRating int = 0;
-	SELECT @UserRating = AVG(@mark + Users.Rating)
-	FROM Users
-	WHERE Users.Id = @idUser
-
-	UPDATE Users
-	SET Rating = @UserRating
-	WHERE Users.Id = @idUser
-
-	IF	@@ERROR != 0
-	BEGIN
-		PRINT N'Error when set rating for Users!';
-		ROLLBACK TRAN CommentMarkTran
-		RETURN
-	END
-
-	DECLARE @PostRating int = 0;
-	SELECT @PostRating = AVG(@mark + Posts.Rating)
-	FROM Posts
-	WHERE Posts.Id = (SELECT Comments.IdPost FROM Comments WHERE Comments.Id = @idComment)
-
-	UPDATE Posts
-	SET Rating = @PostRating
-	WHERE Posts.Id = (SELECT Comments.IdPost FROM Comments WHERE Comments.Id = @idComment)
-
-	IF	@@ERROR != 0
-	BEGIN
-		PRINT N'Error when set rating for Posts!';
+		PRINT N'Error when insert for Post Rating!';
 		ROLLBACK TRAN CommentMarkTran
 		RETURN
 	END
@@ -124,7 +91,24 @@ BEGIN
 
 	IF	@@ERROR != 0
 	BEGIN
-		PRINT N'Error when set rating for Comment!';
+		PRINT N'Error when recalc rating for Comments!';
+		ROLLBACK TRAN CommentMarkTran
+		RETURN
+	END
+
+	DECLARE @UserRating int = 0;
+	SELECT @UserRating = AVG(Comments.Rating + Users.Rating)
+	FROM Users JOIN Comments
+		ON Users.Id = Comments.IdUser
+	WHERE Users.Id = @idUser
+
+	UPDATE Users
+	SET Rating = @UserRating
+	WHERE Users.Id = @idUser
+
+	IF	@@ERROR != 0
+	BEGIN
+		PRINT N'Error when recalc rating for Users!';
 		ROLLBACK TRAN CommentMarkTran
 		RETURN
 	END
