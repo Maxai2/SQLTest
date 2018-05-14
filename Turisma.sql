@@ -28,7 +28,7 @@ CREATE TABLE [User]
 	Last_Name nvarchar(20) NOT NULL,
 	Picture_Src nvarchar(50) NULL,
 
-	CONSTRAINT PK_User_Id 
+	CONSTRAINT PK_User_Id PRIMARY KEY (Id)
 )
 
 CREATE TABLE [Route]
@@ -38,9 +38,11 @@ CREATE TABLE [Route]
 	Route_Description text NULL,
 	Route_Time time NOT NULL,
 	City_Id int NOT NULL,
+	[User_Id] int NOT NULL,
 
 	CONSTRAINT PK_Route_Id PRIMARY KEY (Id),
-	CONSTRAINT FK_Route_City_Id FOREIGN KEY (City_Id) REFERENCES City(Id)
+	CONSTRAINT FK_Route_City_Id FOREIGN KEY (City_Id) REFERENCES City(Id),
+	CONSTRAINT FK_Route_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id)
 )
 
 CREATE TABLE Route_Type
@@ -66,3 +68,18 @@ CREATE TABLE Point
 	CONSTRAINT PK_Point_Id PRIMARY KEY (Id),
 	CONSTRAINT FK_Point_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id)
 )
+
+CREATE TABLE Raiting
+(
+	Id int IDENTITY(1, 1),
+	[Date] date NOT NULL,
+	Mark int NOT NULL,
+	Route_Id int NOT NULL,
+	[User_Id] int NOT NULL,
+
+	CONSTRAINT PK_Raiting_Id PRIMARY KEY (Id),
+	CONSTRAINT FK_Raiting_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id),
+	CONSTRAINT FK_RAINTING_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id)
+)
+
+CREATE TABLE 
