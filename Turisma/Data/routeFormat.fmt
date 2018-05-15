@@ -1,0 +1,9 @@
+13.0
+7
+1       SQLCHAR             0       12      ", "     1     Id                                     ""
+2       SQLCHAR             0       12      ", "     2     User_Id                                ""
+3       SQLCHAR             0       12      ", "     3     Route_Type_Id                          ""
+4       SQLCHAR             0       12      ", '"     4     City_Id                                ""
+5       SQLCHAR             0       19      "', N'"     5     Route_Time                             ""
+6       SQLCHAR             0       100     "', N'"     6     Route_Name                             ""
+7       SQLCHAR             0       0       "'\r\n"   7     Route_Description                      ""
