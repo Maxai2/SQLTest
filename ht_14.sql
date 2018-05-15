@@ -308,4 +308,8 @@ ADD MEMBER AdministratorUser
 
 /*После создания всех ролей, пользователей, предоставления необходимых привилегий и проверки на работоспособность необходимо удалить вашего пользователя из этой БД. */
 
-DROP USER 
+DROP USER LibrarianUser
+DROP USER SeniorLibrarianUser
+DROP USER TeacherUser
+DROP USER StudentUser
+DROP USER AdministratorUser
