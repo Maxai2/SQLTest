@@ -264,11 +264,48 @@ TO Administrator
 
 --------------------------------------------------------------------------------------------
 
-/*После создания ролей, необходимо добавить пользователей в роли (хотя бы по
-одному в каждую роль).
-После создания всех ролей, пользователей, предоставления необходимых
-привилегий и проверки на работоспособность необходимо удалить вашего
-пользователя из этой БД.
-*/
+/*После создания ролей, необходимо добавить пользователей в роли (хотя бы по одному в каждую роль). */
+
+CREATE USER LibrarianUser
+WITHOUT LOGIN
+
+ALTER ROLE Librarian
+ADD MEMBER LibrarianUser
+
+-----------------------------------------------------
+
+CREATE USER SeniorLibrarianUser
+WITHOUT LOGIN
+
+ALTER ROLE SeniorLibrarian
+ADD MEMBER SeniorLibrarianUser
+
+-----------------------------------------------------
+
+CREATE USER TeacherUser
+WITHOUT LOGIN
+
+ALTER ROLE Teacher
+ADD MEMBER TeacherUser
+
+-----------------------------------------------------
+
+CREATE USER StudentUser
+WITHOUT LOGIN
+
+ALTER ROLE Student
+ADD MEMBER StudentUser
+
+-----------------------------------------------------
+
+CREATE USER AdministratorUser
+WITHOUT LOGIN
+
+ALTER ROLE Administrator
+ADD MEMBER AdministratorUser
 
 --------------------------------------------------------------------------------------------
+
+/*После создания всех ролей, пользователей, предоставления необходимых привилегий и проверки на работоспособность необходимо удалить вашего пользователя из этой БД. */
+
+DROP USER 
