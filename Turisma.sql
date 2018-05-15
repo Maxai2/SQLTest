@@ -82,4 +82,16 @@ CREATE TABLE Raiting
 	CONSTRAINT FK_RAINTING_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id)
 )
 
-CREATE TABLE 
+CREATE TABLE Comment
+(
+	Id int IDENTITY(1, 1),
+	[Date] date NOT NULL,
+	[Text] text NOT NULL,
+	Like_Count int NOT NULL DEFAULT(0),
+	Route_Id int NOT NULL,
+	[User_Id] int NOT NULL,
+
+	CONSTRAINT PK_Comment_Id PRIMARY KEY (Id),
+	CONSTRAINT FK_Comment_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id),
+	CONSTRAINT FK_Comment_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id)
+)
