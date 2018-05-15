@@ -1,0 +1,3 @@
+1, 1, 1, 1, '4:30', N'Monuments of Odessa', N'The most interesting and popular monuments in the center of Odessa'
+2, 1, 2, 2, '4:30', N'Monuments of Kiev', N'The most interesting and popular monuments in the center of Kiev'
+3, 2, 1, 3, '4:30', N'First Step in Baku', N'The most interesting and popular places in the center of Baku'
