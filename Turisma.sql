@@ -27,6 +27,8 @@ CREATE TABLE [User]
 	First_Name nvarchar(20) NOT NULL,
 	Last_Name nvarchar(20) NOT NULL,
 	Picture_Src nvarchar(50) NULL,
+	[Mail] nvarchar(50) NOT NULL,
+	[FB] nvarchar(50) NULL,
 
 	CONSTRAINT PK_User_Id PRIMARY KEY (Id)
 )
