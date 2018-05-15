@@ -238,7 +238,29 @@ TO Student
 /*Администратор:
 1. Может все.*/
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON S_Cards
+TO Administrator
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON T_Cards
+TO Administrator
+
+GRANT EXECUTE ON OBJECT :: ChangeColumn
+TO Administrator
+
+GRANT SELECT ON InfoAboutBooks
+TO Administrator
+
+GRANT SELECT ON InfoAboutStudTeach
+TO Administrator
+
+GRANT SELECT ON InfoAboutStud
+TO Administrator
+
+GRANT EXECUTE ON OBJECT :: BooksDebtByTeach
+TO Administrator
+
+GRANT EXECUTE ON OBJECT :: BooksDebtByStud
+TO Administrator
 
 --------------------------------------------------------------------------------------------
 
