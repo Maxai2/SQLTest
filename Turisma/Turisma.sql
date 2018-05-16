@@ -109,11 +109,18 @@ CREATE TABLE Comment
 	[Text] text NOT NULL,
 	Like_Count int NOT NULL DEFAULT(0),
 	Route_Id int NOT NULL,
-	[User_Id] int NOT NULL,
 
 	CONSTRAINT PK_Comment_Id PRIMARY KEY (Id),
-	CONSTRAINT FK_Comment_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id),
-	CONSTRAINT FK_Comment_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id)
+	CONSTRAINT FK_Comment_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id)
+)
+
+CREATE TABLE Likes
+(
+	[User_Id] int NOT NULL,
+	Comment_Id  int NOT NULL,
+
+	CONSTRAINT FK_Likes_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id),
+	CONSTRAINT FK_Likes_Comment_Id FOREIGN KEY (Comment_Id) REFERENCES  Comment(Id)
 )
 
 BACKUP DATABASE Tourism
@@ -153,7 +160,6 @@ FROM [Route]
 
 GO
 
-
 CREATE TRIGGER PointInsert
 ON Point INSTEAD OF INSERT
 AS
@@ -171,6 +177,9 @@ WITH
 	CODEPAGE = '65001',
 	FIRE_TRIGGERS
 )
+
+UPDATE Point
+SET [Index] += 1
 
 SET IDENTITY_INSERT Point OFF
 
@@ -196,7 +205,7 @@ RETURNS TABLE
 AS
 RETURN
 (
-	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, City.City_Name
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
 		JOIN Route_Type
@@ -221,19 +230,131 @@ RETURN
 	WHERE City.City_Name = @CityName AND Route_Type.Route_Type_Name = @RouteTypeName
 )
 
-/*3. Вывод всех маршрутов указанного города, типа и отсортированным по
-рейтингу.
-4. Вывод всех маршрутов, которые пользователь создал.
-5. Вывод информации и описания конкретного маршрута (по Id).
-6. Вывод всех точек маршрута для отображения их списком.
-7. Вывод всех точек маршрута для отображения их на карте.
-8. Вывод всех комментариев к маршруту.
-9. Запрос для регистрации пользователя через почтовый ящик.
-10. Запрос для регистрации пользователя через FB.
+/*3. Вывод всех маршрутов указанного города, типа и отсортированным по рейтингу. ?? */
+
+GO
+
+CREATE FUNCTION AllRouteByCityAndRouteTypeOrederByRating
+(@CityName nvarchar(20), @RouteTypeName nvarchar(20))
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, (SELECT SUM(Raiting.Mark) FROM Raiting JOIN [Route] 
+		ON Raiting.Route_Id = [Route].Id) AS RaitingMark
+	FROM [Route] JOIN City
+		ON [Route].City_Id = City.Id
+		JOIN Route_Type
+		ON [Route].Route_Type_Id = Route_Type.Id
+	WHERE City.City_Name = @CityName AND Route_Type.Route_Type_Name = @RouteTypeName
+	ORDER BY RaitingMark
+)
+
+/*4. Вывод всех маршрутов, которые пользователь создал. */
+
+GO
+
+CREATE FUNCTION AllRouteByCityByUser
+(@CityName nvarchar(20), @UserId int)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name
+	FROM [Route] JOIN City
+		ON [Route].City_Id = City.Id
+		JOIN Route_Type
+		ON [Route].Route_Type_Id = Route_Type.Id
+	WHERE City.City_Name = @CityName AND [Route].[User_Id] = @UserId
+)
+
+/*5. Вывод информации и описания конкретного маршрута (по Id). */
+
+GO
+
+CREATE FUNCTION InfoAboutRouteById
+(@UserId int)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, City.City_Name, [User].First_Name, [User].Last_Name
+	FROM [Route] JOIN City
+		ON [Route].City_Id = City.Id
+		JOIN Route_Type
+		ON [Route].Route_Type_Id = Route_Type.Id
+		JOIN [User]
+		ON [Route].[User_Id] = [User].Id
+	WHERE [User].Id = @UserId
+)
+
+/*6. Вывод всех точек маршрута для отображения их списком. ?? */
+
+GO
+
+CREATE FUNCTION AllPointByRouteIdForList
+(@RouteId int)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT Point.Id, Point.Point_Name, Point.Point_Description, Point.[Index], [Route].Route_Name
+	FROM Point JOIN [Route]
+		ON Point.Route_Id = [Route].Id
+	WHERE [Route].Id = @RouteId
+)
+
+/*7. Вывод всех точек маршрута для отображения их на карте. */
+
+GO
+
+CREATE FUNCTION AllPointByRouteIdForMap
+(@RouteId int)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT Point.Id, Point.Point_Name, Point.Point_Description, Point.[Index], [Route].Route_Name, Point.Point_Location.ToString()
+	FROM Point JOIN [Route]
+		ON Point.Route_Id = [Route].Id
+	WHERE [Route].Id = @RouteId
+)
+
+/*8. Вывод всех комментариев к маршруту. */
+
+GO
+
+CREATE FUNCTION AllCommentByRoute
+(@RouteId int)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT Comment.Id, Comment.[Text], Comment.Like_Count, Comment.[Date], [Route].Route_Name
+	FROM Comment JOIN [Route]
+		ON Comment.Route_Id = [Route].Id
+	WHERE [Route].Id = @RouteId
+)
+
+/*9. Запрос для регистрации пользователя через почтовый ящик. */
+
+GO
+
+CREATE TRIGGER RegByMail
+ON [User] INSTEAD OF INSERT
+AS
+BEGIN
+	INSERT INTO [User] (First_Name, Last_Name, Mail, FB)
+END
+
+/*10. Запрос для регистрации пользователя через FB.
 11. Запрос для добавления маршрута.
 12. Запрос для добавления точки в маршрут.
 13. Запрос для добавления комментария маршруту.
 14. Запрос для оценивания маршрута.*/
 
-
 ----------------------------------------------------------------------
+
+/*1. Триггер, для пересчета рейтинга маршрута.*/
+
+---------------------------------------------------------------------
