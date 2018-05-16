@@ -10,4 +10,4 @@
 1, N'Babel monument', N'The monument to the writer Isaac Babel, set on Zhukovsky Street in 2011.', N'46.479804', N'30.739711'
 1, N'Gotsman monument', N'It is dedicated to the image of the Odessa police officer after wartime. Gotsman - the main hero of the television series "Liquidation".', N'46.478095', N'30.742946'
 1, N'Monument to Taras Shevchenko', N'Taras Shevchenko is Ukrainian and Russian poet, writer and artist. The monument was erected in 1966.', N'46.479349', N'30.750722'
-1, N'Monument to soldiers-internationalists', N'The monument is dedicated to the 220 died Odessa soldiers in Afghanistan, set in 2000.', N'46.479432', N'30.758744');
+1, N'Monument to soldiers-internationalists', N'The monument is dedicated to the 220 died Odessa soldiers in Afghanistan, set in 2000.', N'46.479432', N'30.758744'

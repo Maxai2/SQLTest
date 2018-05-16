@@ -1,0 +1,7 @@
+13.0
+5
+1       SQLCHAR             0       12      ", N'"     1     Route_Id                               ""
+2       SQLCHAR             0       100     "', N'"     2     Point_Name                             ""
+3       SQLCHAR             0       0       "', N'"     3     Point_Description                      ""
+4       SQLCHAR             0       30      "', N'"     4     Temp_Latitude                          ""
+5       SQLCHAR             0       30      "'\r\n"     5     Temp_Longitude                         ""
