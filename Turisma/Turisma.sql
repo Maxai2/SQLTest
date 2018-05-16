@@ -340,11 +340,14 @@ RETURN
 
 GO
 
-CREATE TRIGGER RegByMail
-ON [User] INSTEAD OF INSERT
+CREATE PROCEDURE RegUserByMail
+	@FirstName nvarchar(25),
+	@LastName nvarchar(25),
+	@mail nvarchar(25)
 AS
 BEGIN
-	INSERT INTO [User] (First_Name, Last_Name, Mail, FB)
+	INSERT INTO [User] (First_Name, Last_Name, Mail)
+	VALUES (@FirstName, @LastName, @mail)
 END
 
 /*10. Запрос для регистрации пользователя через FB.
