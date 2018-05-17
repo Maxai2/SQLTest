@@ -51,6 +51,9 @@ CREATE TABLE Route_Type
 	CONSTRAINT PK_Route_Type_Id PRIMARY KEY (Id)
 )
 
+INSERT INTO Route_Type (Route_Type_Name)
+VALUES (N'Пешеход'), (N'Роликовые коньки'), (N'Велосипед'), (N'Машина')
+
 CREATE TABLE [Route]
 (
 	Id int IDENTITY(1, 1),
@@ -60,18 +63,24 @@ CREATE TABLE [Route]
 	Route_Time time NOT NULL,
 	Route_Name nvarchar(50) NOT NULL,
 	Route_Description text NULL,
-	Route_Rating_Mark float NOT NULL,
+	Route_Rating_Mark float NOT NULL DEFAULT (0.0),
 
 	CONSTRAINT PK_Route_Id PRIMARY KEY (Id),
 	CONSTRAINT FK_Route_City_Id FOREIGN KEY (City_Id) REFERENCES City(Id),
 	CONSTRAINT FK_Route_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id),
-	CONSTRAINT FK_Route_RouteType_Id FOREIGN KEY (Route_Type_Id) REFERENCES Route_Type(Id),
-	CONSTRAINT DF_Route_Route_Rating_Mark  DEFAULT (0.0) FOR Route_Rating_Mark
+	CONSTRAINT FK_Route_RouteType_Id FOREIGN KEY (Route_Type_Id) REFERENCES Route_Type(Id)
 )
 
-INSERT INTO Route_Type (Route_Type_Name)
-VALUES (N'Пешеход'), (N'Роликовые коньки'), (N'Велосипед'), (N'Машина')
+ALTER TABLE [Route]
+ALTER COLUMN Route_Rating_Mark real NOT NULL
 
+ALTER TABLE [Route]
+ADD CONSTRAINT DF_Route_Route_Rating_Mark DEFAULT (0.0) FOR Route_Rating_Mark
+
+ALTER TABLE [Route]
+DROP CONSTRAINT DF__Route__Route_Rat__403A8C7D
+
+	--CONSTRAINT DF_Route_Route_Rating_Mark DEFAULT (0.0) FOR Route_Rating_Mark
 CREATE TABLE Point
 (
 	Route_Id int NOT NULL,
@@ -91,7 +100,7 @@ CREATE TABLE Point
 CREATE TABLE Raiting
 (
 	Id int IDENTITY(1, 1),
-	Mark int NOT NULL,
+	Mark float NOT NULL,
 	Route_Id int NOT NULL,
 	[User_Id] int NOT NULL,
 
@@ -144,10 +153,10 @@ SET FB = NULL
 
 TRUNCATE TABLE [User]
 
-DELETE FROM [User]
-
 SELECT *
 FROM [User]
+
+DELETE FROM [User]
 
 BULK INSERT [Route]
 FROM 'C:\TempSQL\Turisma\routes.txt'
@@ -461,12 +470,12 @@ ALTER TRIGGER ReCalcRatingByRouteId
 ON Raiting AFTER INSERT
 AS
 BEGIN
-	DECLARE @SumMark float = 0
+	DECLARE @SumMark float = 0.0
 	SELECT @SumMark = CAST(SUM(inserted.Mark) AS float)
 	FROM inserted JOIN [Route]
 		ON inserted.Route_Id = [Route].Id
 
-	DECLARE @tempMark float = 0;
+	DECLARE @tempMark float = 0.0;
 	SELECT @tempMark = CAST(AVG(@SumMark) AS float)
 	FROM inserted JOIN [Route]
 		ON inserted.Route_Id = [Route].Id
@@ -481,11 +490,17 @@ BEGIN
 END
 
 INSERT INTO Raiting (Mark, Route_Id, [User_Id])
-VALUES (3, 1, 2)
+VALUES (4.0, 1, 2)
 
 SELECT *
 FROM [Route]
 
+UPDATE [Route]
+SET Route_Rating_Mark = 0
+WHERE Id = 1
+
+SELECT *
+FROM Raiting
 
 DELETE FROM Raiting
 
