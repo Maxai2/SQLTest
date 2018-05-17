@@ -1,7 +1,6 @@
 13.0
-5
+4
 1       SQLCHAR             0       12      ", N'"     1     Id                         ""
 2       SQLCHAR             0       40      "', N'"     2     First_Name                 ""
 3       SQLCHAR             0       40      "', N'"     3     Last_Name                  ""
-4       SQLCHAR             0       100     ", "     4     Mail                       ""
-5       SQLCHAR             0       100     "\r\n"     5     FB                         ""
+4       SQLCHAR             0       100     "'\r\n"     4     Mail                       ""
