@@ -60,11 +60,13 @@ CREATE TABLE [Route]
 	Route_Time time NOT NULL,
 	Route_Name nvarchar(50) NOT NULL,
 	Route_Description text NULL,
+	Route_Rating_Mark float NOT NULL,
 
 	CONSTRAINT PK_Route_Id PRIMARY KEY (Id),
 	CONSTRAINT FK_Route_City_Id FOREIGN KEY (City_Id) REFERENCES City(Id),
 	CONSTRAINT FK_Route_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id),
-	CONSTRAINT FK_Route_RouteType_Id FOREIGN KEY (Route_Type_Id) REFERENCES Route_Type(Id)
+	CONSTRAINT FK_Route_RouteType_Id FOREIGN KEY (Route_Type_Id) REFERENCES Route_Type(Id),
+	CONSTRAINT DF_Route_Route_Rating_Mark  DEFAULT (0.0) FOR Route_Rating_Mark
 )
 
 INSERT INTO Route_Type (Route_Type_Name)
@@ -86,20 +88,17 @@ CREATE TABLE Point
 	CONSTRAINT FK_Point_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id)
 )
 
-ALTER TABLE Point
-ALTER COLUMN Temp_Longitude nvarchar(15) NULL
-
 CREATE TABLE Raiting
 (
 	Id int IDENTITY(1, 1),
-	[Date] date NOT NULL,
 	Mark int NOT NULL,
 	Route_Id int NOT NULL,
 	[User_Id] int NOT NULL,
 
 	CONSTRAINT PK_Raiting_Id PRIMARY KEY (Id),
 	CONSTRAINT FK_Raiting_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id),
-	CONSTRAINT FK_RAINTING_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id)
+	CONSTRAINT FK_Raiting_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id),
+	CONSTRAINT UQ_Raiting_User_Id UNIQUE ([User_Id])
 )
 
 CREATE TABLE Comment
@@ -116,14 +115,14 @@ CREATE TABLE Comment
 
 CREATE TABLE Likes
 (
-	[User_Id] int NOT NULL,
-	Comment_Id  int NOT NULL,
+	[User_Id] int NOT NULL UNIQUE,
+	Comment_Id  int NOT NULL UNIQUE,
 
 	CONSTRAINT FK_Likes_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id),
-	CONSTRAINT FK_Likes_Comment_Id FOREIGN KEY (Comment_Id) REFERENCES  Comment(Id)
+	CONSTRAINT FK_Likes_Comment_Id FOREIGN KEY (Comment_Id) REFERENCES Comment(Id)
 )
 
-BACKUP DATABASE Tourism
+BACKUP DATABASE Turisma_ru
 TO DISK = ''
 WITH
 NAME = 'Dif BackUp',
@@ -133,15 +132,19 @@ DIFFERENTIAL
 ----------------------------------------------------------------------
 
 BULK INSERT [User]
-FROM 'D:\Ali\Desktop\Data\users.txt'
+FROM 'C:\TempSQL\Turisma\users.txt'
 WITH
 (
-	FORMATFILE = 'D:\Ali\Desktop\Data\userFormat.fmt',
+	FORMATFILE = 'C:\TempSQL\Turisma\userFormat.fmt',
 	CODEPAGE = '65001'
 )
 
 UPDATE [User]
 SET FB = NULL
+
+TRUNCATE TABLE [User]
+
+DELETE FROM [User]
 
 SELECT *
 FROM [User]
@@ -157,6 +160,7 @@ WITH
 SELECT *
 FROM [Route]
 
+DELETE FROM [Route]
 
 GO
 
@@ -178,8 +182,21 @@ WITH
 	FIRE_TRIGGERS
 )
 
-UPDATE Point
-SET [Index] += 1
+DECLARE @index int = 1
+
+WHILE @index != 14
+BEGIN
+	UPDATE Point
+	SET [Index] = @index
+	WHERE Id = @index
+
+	SET @index += 1
+END
+
+DROP TRIGGER PointInsert
+
+ALTER TABLE Point
+ALTER COLUMN [Index] int NOT NULL
 
 SET IDENTITY_INSERT Point OFF
 
@@ -195,9 +212,17 @@ FROM Point
 --SET @Geo = geography::Point(47.65100, -122.34900, 4326)  
 --PRINT @Geo.ToString();  
 
+BACKUP DATABASE Turisma_ru
+TO DISK = ''
+WITH
+NAME = 'Dif BackUp',
+DESCRIPTION = 'Bulk Insert',
+DIFFERENTIAL
+
 ----------------------------------------------------------------------
-GO
 /*1. Вывод всех маршрутов указанного города. */
+
+GO
 
 CREATE FUNCTION AllRouteByCity
 (@CityName nvarchar(20))
@@ -350,14 +375,120 @@ BEGIN
 	VALUES (@FirstName, @LastName, @mail)
 END
 
-/*10. Запрос для регистрации пользователя через FB.
-11. Запрос для добавления маршрута.
-12. Запрос для добавления точки в маршрут.
-13. Запрос для добавления комментария маршруту.
-14. Запрос для оценивания маршрута.*/
+/*10. Запрос для регистрации пользователя через FB. */
+
+GO
+
+CREATE PROCEDURE RegUserByFB
+	@FirstName nvarchar(25),
+	@LastName nvarchar(25),
+	@FB nvarchar(25)
+AS
+BEGIN
+	INSERT INTO [User] (First_Name, Last_Name, Mail)
+	VALUES (@FirstName, @LastName, @FB)
+END
+
+/*11. Запрос для добавления маршрута. */
+
+GO
+
+CREATE PROCEDURE AddRoute
+	@UserId int,
+	@RouteTypeId int,
+	@CityId int,
+	@RouteTime time,
+	@RouteName nvarchar(50),
+	@RouteDesc text
+AS
+BEGIN
+	INSERT INTO [Route] ([User_Id], Route_Type_Id, City_Id, Route_Time, Route_Name, Route_Description)
+	VALUES (@UserId, @RouteTypeId, @CityId, @RouteTime, @RouteName, @RouteDesc)
+END
+
+/*12. Запрос для добавления точки в маршрут. */
+
+GO
+
+CREATE PROCEDURE AddPoint
+	@RouteId int,
+	@PointName nvarchar(50),
+	@PointDesc text,
+	@Index int,
+	@PointLocation geography,
+	@PicSrc nvarchar(50)
+AS
+BEGIN
+	INSERT INTO Point (Route_Id, Point_Name, Point_Description, [Index], Point_Location, Picture_Src)
+	VALUES (@RouteId, @PointName, @PointDesc, @Index, @PointLocation, @PicSrc)
+END
+
+/*13. Запрос для добавления комментария маршруту.*/
+
+GO
+
+CREATE PROCEDURE AddComment
+	@Date date,
+	@Text text,
+	@RouteId int
+AS
+BEGIN
+	INSERT INTO Comment ([Date], [Text], Route_Id)
+	VALUES (@Date, @Text, @RouteId)
+END
+
+/*14. Запрос для оценивания маршрута.*/
+
+GO
+
+CREATE PROCEDURE AddRaiting
+	@Mark int,
+	@RouteId int,
+	@UserId int
+AS
+BEGIN
+	INSERT INTO Raiting (Mark, Route_Id, [User_Id])
+	VALUES (@Mark, @RouteId, @UserId)
+END
 
 ----------------------------------------------------------------------
 
 /*1. Триггер, для пересчета рейтинга маршрута.*/
+
+GO
+
+ALTER TRIGGER ReCalcRatingByRouteId
+ON Raiting AFTER INSERT
+AS
+BEGIN
+	DECLARE @SumMark float = 0
+	SELECT @SumMark = CAST(SUM(inserted.Mark) AS float)
+	FROM inserted JOIN [Route]
+		ON inserted.Route_Id = [Route].Id
+
+	DECLARE @tempMark float = 0;
+	SELECT @tempMark = CAST(AVG(@SumMark) AS float)
+	FROM inserted JOIN [Route]
+		ON inserted.Route_Id = [Route].Id
+
+	DECLARE @RouteId int = 0
+	SELECT @RouteId = inserted.Route_Id 
+	FROM inserted
+
+	UPDATE [Route]
+	SET Route_Rating_Mark = @tempMark
+	WHERE [Route].Id = @RouteId
+END
+
+INSERT INTO Raiting (Mark, Route_Id, [User_Id])
+VALUES (3, 1, 2)
+
+SELECT *
+FROM [Route]
+
+
+DELETE FROM Raiting
+
+TRUNCATE TABLE Raiting
 
 ---------------------------------------------------------------------
