@@ -71,15 +71,6 @@ CREATE TABLE [Route]
 	CONSTRAINT FK_Route_RouteType_Id FOREIGN KEY (Route_Type_Id) REFERENCES Route_Type(Id)
 )
 
-ALTER TABLE [Route]
-ALTER COLUMN Route_Rating_Mark real NOT NULL
-
-ALTER TABLE [Route]
-ADD CONSTRAINT DF_Route_Route_Rating_Mark DEFAULT (0.0) FOR Route_Rating_Mark
-
-ALTER TABLE [Route]
-DROP CONSTRAINT DF__Route__Route_Rat__403A8C7D
-
 	--CONSTRAINT DF_Route_Route_Rating_Mark DEFAULT (0.0) FOR Route_Rating_Mark
 CREATE TABLE Point
 (
@@ -239,11 +230,9 @@ RETURNS TABLE
 AS
 RETURN
 (
-	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, City.City_Name
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, City.City_Name, [Route].Route_Rating_Mark
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
-		JOIN Route_Type
-		ON [Route].Route_Type_Id = Route_Type.Id
 	WHERE City.City_Name = @CityName
 )
 
@@ -256,7 +245,7 @@ RETURNS TABLE
 AS
 RETURN
 (
-	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, City.City_Name, Route_Type.Route_Type_Name, [Route].Route_Rating_Mark
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
 		JOIN Route_Type
@@ -264,7 +253,7 @@ RETURN
 	WHERE City.City_Name = @CityName AND Route_Type.Route_Type_Name = @RouteTypeName
 )
 
-/*3. Вывод всех маршрутов указанного города, типа и отсортированным по рейтингу. ?? */
+/*3. Вывод всех маршрутов указанного города, типа и отсортированным по рейтингу. */
 
 GO
 
@@ -274,14 +263,13 @@ RETURNS TABLE
 AS
 RETURN
 (
-	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, (SELECT SUM(Raiting.Mark) FROM Raiting JOIN [Route] 
-		ON Raiting.Route_Id = [Route].Id) AS RaitingMark
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, City.City_Name, Route_Type.Route_Type_Name, [Route].Route_Rating_Mark
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
 		JOIN Route_Type
 		ON [Route].Route_Type_Id = Route_Type.Id
 	WHERE City.City_Name = @CityName AND Route_Type.Route_Type_Name = @RouteTypeName
-	ORDER BY RaitingMark
+	ORDER BY [Route].Route_Rating_Mark
 )
 
 /*4. Вывод всех маршрутов, которые пользователь создал. */
@@ -289,17 +277,19 @@ RETURN
 GO
 
 CREATE FUNCTION AllRouteByCityByUser
-(@CityName nvarchar(20), @UserId int)
+(@UserId int)
 RETURNS TABLE
 AS
 RETURN
 (
-	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, City.City_Name, [Route].Route_Rating_Mark, [User].First_Name, [User].Last_Name
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
 		JOIN Route_Type
 		ON [Route].Route_Type_Id = Route_Type.Id
-	WHERE City.City_Name = @CityName AND [Route].[User_Id] = @UserId
+		JOIN [User]
+		ON [Route].[User_Id] = [User].Id
+	WHERE [Route].[User_Id] = @UserId
 )
 
 /*5. Вывод информации и описания конкретного маршрута (по Id). */
@@ -307,22 +297,20 @@ RETURN
 GO
 
 CREATE FUNCTION InfoAboutRouteById
-(@UserId int)
+(@RouteId int)
 RETURNS TABLE
 AS
 RETURN
 (
-	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, City.City_Name, [User].First_Name, [User].Last_Name
+	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, Route_Type.Route_Type_Name, City.City_Name, [Route].Route_Rating_Mark
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
 		JOIN Route_Type
 		ON [Route].Route_Type_Id = Route_Type.Id
-		JOIN [User]
-		ON [Route].[User_Id] = [User].Id
-	WHERE [User].Id = @UserId
+	WHERE [Route].Id = @RouteId
 )
 
-/*6. Вывод всех точек маршрута для отображения их списком. ?? */
+/*6. Вывод всех точек маршрута для отображения их списком. */
 
 GO
 
@@ -384,7 +372,7 @@ BEGIN
 	VALUES (@FirstName, @LastName, @mail)
 END
 
-/*10. Запрос для регистрации пользователя через FB. */
+/*10. Запрос для регистрации пользователя через FB. ? */
 
 GO
 
@@ -394,7 +382,7 @@ CREATE PROCEDURE RegUserByFB
 	@FB nvarchar(25)
 AS
 BEGIN
-	INSERT INTO [User] (First_Name, Last_Name, Mail)
+	INSERT INTO [User] (First_Name, Last_Name, FB)
 	VALUES (@FirstName, @LastName, @FB)
 END
 
@@ -466,7 +454,7 @@ END
 
 GO
 
-ALTER TRIGGER ReCalcRatingByRouteId
+CREATE TRIGGER ReCalcRatingByRouteId
 ON Raiting AFTER INSERT
 AS
 BEGIN
