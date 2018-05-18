@@ -463,8 +463,8 @@ BEGIN
 	FROM inserted JOIN [Route]
 		ON inserted.Route_Id = [Route].Id
 
-	DECLARE @tempMark float = 0.0;
-	SELECT @tempMark = CAST(AVG(@SumMark) AS float)
+	DECLARE @CntMark int = 0;
+	SELECT @CntMark = COUNT(*)
 	FROM inserted JOIN [Route]
 		ON inserted.Route_Id = [Route].Id
 
@@ -473,7 +473,7 @@ BEGIN
 	FROM inserted
 
 	UPDATE [Route]
-	SET Route_Rating_Mark = @tempMark
+	SET Route_Rating_Mark = @SumMark / @CntMark
 	WHERE [Route].Id = @RouteId
 END
 
