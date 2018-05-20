@@ -90,15 +90,13 @@ CREATE TABLE Point
 
 CREATE TABLE Raiting
 (
-	Id int IDENTITY(1, 1),
 	Mark float NOT NULL,
 	Route_Id int NOT NULL,
 	[User_Id] int NOT NULL,
 
-	CONSTRAINT PK_Raiting_Id PRIMARY KEY (Id),
 	CONSTRAINT FK_Raiting_Route_Id FOREIGN KEY (Route_Id) REFERENCES [Route](Id),
 	CONSTRAINT FK_Raiting_User_Id FOREIGN KEY ([User_Id]) REFERENCES [User](Id),
-	CONSTRAINT UQ_Raiting_User_Id UNIQUE ([User_Id])
+	CONSTRAINT UQ_Raiting_Route_User_Id UNIQUE (Route_Id, [User_Id])
 )
 
 CREATE TABLE Comment
@@ -257,12 +255,10 @@ RETURN
 
 GO
 
-CREATE FUNCTION AllRouteByCityAndRouteTypeOrederByRating
+CREATE PROCEDURE AllRouteByCityAndRouteTypeOrederByRating
 (@CityName nvarchar(20), @RouteTypeName nvarchar(20))
-RETURNS TABLE
 AS
-RETURN
-(
+BEGIN
 	SELECT [Route].Route_Name, [Route].Route_Description, [Route].Route_Time, City.City_Name, Route_Type.Route_Type_Name, [Route].Route_Rating_Mark
 	FROM [Route] JOIN City
 		ON [Route].City_Id = City.Id
@@ -270,7 +266,7 @@ RETURN
 		ON [Route].Route_Type_Id = Route_Type.Id
 	WHERE City.City_Name = @CityName AND Route_Type.Route_Type_Name = @RouteTypeName
 	ORDER BY [Route].Route_Rating_Mark
-)
+END
 
 /*4. Вывод всех маршрутов, которые пользователь создал. */
 
@@ -420,6 +416,29 @@ BEGIN
 	VALUES (@RouteId, @PointName, @PointDesc, @Index, @PointLocation, @PicSrc)
 END
 
+DECLARE @point geography;
+SET @point = geography::Point(47.65100, -122.34900, 4326)
+
+EXEC AddPoint 1, N'sdfvfd', N'asdfsdsd', 1, @point, NULL
+
+SELECT *
+FROM Point
+
+INSERT INTO [Route] (City_Id, Route_Description, Route_Name, Route_Time, Route_Type_Id, [User_Id])
+VALUES (1, N'afad', N'awfre', N'20:02', 1, 1)
+
+SELECT *
+FROM [Route]
+
+INSERT INTO [User] (First_Name, Last_Name, Mail)
+VALUES (N'asldifh', N'sdfg', N'Naffg')
+
+INSERT INTO City (City_Name, Country_Id)
+VALUES (N'Odessa', 1), (N'Kiev', 1), (N'Baku', 2)
+
+INSERT INTO Country (Country_Name)
+VALUES (N'Ukraina'), (N'Azerbaijan')
+
 /*13. Запрос для добавления комментария маршруту.*/
 
 GO
@@ -455,26 +474,31 @@ END
 GO
 
 CREATE TRIGGER ReCalcRatingByRouteId
-ON Raiting AFTER INSERT
+ON Raiting INSTEAD OF INSERT
 AS
 BEGIN
-	DECLARE @SumMark float = 0.0
-	SELECT @SumMark = CAST(SUM(inserted.Mark) AS float)
-	FROM inserted JOIN [Route]
-		ON inserted.Route_Id = [Route].Id
+    INSERT INTO Raiting(Mark, Route_Id, [User_Id])
+    SELECT inserted.Mark, inserted.Route_Id, inserted.[User_Id]
+    FROM inserted
 
-	DECLARE @CntMark int = 0;
-	SELECT @CntMark = COUNT(*)
-	FROM inserted JOIN [Route]
-		ON inserted.Route_Id = [Route].Id
+    DECLARE @SumMark int = 0;
+    SELECT @SumMark = SUM(Raiting.Mark) FROM inserted JOIN [Route]
+        ON [Route].Id = inserted.Route_Id JOIN Raiting
+            ON Raiting.Route_Id = [Route].Id
 
-	DECLARE @RouteId int = 0
-	SELECT @RouteId = inserted.Route_Id 
-	FROM inserted
+    DECLARE @CntMark int = 0;
+    SELECT @CntMark = COUNT(*)
+    FROM Raiting JOIN [Route]
+        ON Raiting.Route_Id = [Route].Id
 
-	UPDATE [Route]
-	SET Route_Rating_Mark = @SumMark / @CntMark
-	WHERE [Route].Id = @RouteId
+    DECLARE @RouteId int = 0
+    SELECT @RouteId = inserted.Route_Id
+    FROM inserted
+
+    UPDATE [Route]
+    SET [Route].Route_Rating_Mark = @SumMark / @CntMark
+    WHERE [Route].Id = @RouteId
+
 END
 
 INSERT INTO Raiting (Mark, Route_Id, [User_Id])
